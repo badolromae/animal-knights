@@ -282,6 +282,52 @@ input{font:inherit;color:var(--text);-webkit-user-select:text;user-select:text}
 @keyframes flash{from{opacity:1}to{opacity:0}}
 .dust{transform-box:fill-box;transform-origin:center;animation:dust .5s ease-out forwards}
 @keyframes dust{from{opacity:.85;transform:scale(.3)}to{opacity:0;transform:scale(1.7)}}
+
+/* ===== 폰 컨트롤러 v3 ===== */
+.ctrl{display:flex;flex-direction:column}
+.hero{position:relative;display:flex;gap:10px;align-items:stretch;margin:10px 10px 4px;padding:8px 10px 10px;background:var(--panel);border:3px solid var(--line);border-radius:24px;box-shadow:0 6px 0 rgba(74,52,40,.18)}
+.hero-art{position:relative;flex:0 0 38%;max-width:170px;display:flex;align-items:flex-end;justify-content:center;background:radial-gradient(circle at 50% 70%,color-mix(in srgb,var(--pc) 45%,transparent),transparent 70%);border-radius:18px}
+.ha-in{width:100%;transform-origin:50% 100%;animation:herobob 1.6s ease-in-out infinite}
+.ha-in svg{width:100%;height:auto;max-height:30vh;display:block}
+@keyframes herobob{0%,100%{transform:scale(1,1) rotate(-1.5deg)}25%{transform:scale(1.03,.97) rotate(0)}50%{transform:scale(.98,1.04) translateY(-4px) rotate(1.5deg)}75%{transform:scale(1.02,.98)}}
+.hero-i{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;justify-content:center}
+.hero-n{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.hero-n b{font-size:20px}
+.hero-n em{font-style:normal;font-size:13px;background:var(--pc);color:#fff;border:2px solid var(--line);border-radius:10px;padding:0 7px}.hero-n em.bp{background:#FFC93C;color:var(--ink)}
+.hp.big{position:relative;height:22px;border-radius:12px}.hp.big span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#3a2618;text-shadow:0 1px 0 #fff}
+.stg{display:grid;grid-template-columns:1fr 1fr;gap:5px}.stg span{background:var(--panel2);border:2px solid var(--line);border-radius:11px;padding:3px 7px;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stg span.w{grid-column:1/-1}.stg b{font-size:15px}
+.emo{position:absolute;right:-6px;top:-6px;font-size:40px;line-height:1;text-align:center;animation:emob 1.2s ease-in-out infinite;filter:drop-shadow(0 3px 0 rgba(0,0,0,.2))}.emo small{display:block;font-size:11px;background:#fff;border:2px solid var(--line);border-radius:8px;padding:0 4px}
+@keyframes emob{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-6px) rotate(8deg)}}
+.oth{background:var(--panel);border:3px solid var(--line);border-radius:16px;padding:6px 9px;display:flex;flex-direction:column;gap:4px;max-height:28vh;overflow:auto}
+.oth-h{font-size:12px;color:var(--sub)}
+.oth-r{display:flex;align-items:center;gap:6px;font-size:13px}.oth-r .av{width:26px;height:26px;flex:none;border-radius:50%;border:2px solid var(--pc);overflow:hidden;background:#fff}.oth-r .av svg{width:100%;height:100%}
+.oth-n{width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.oth-r .hp{flex:1;height:10px}.oth-r small{width:48px;text-align:right}.oth-r.dead{opacity:.45}
+.ctrl.gray{filter:grayscale(1) brightness(.85)}.ctrl.gray .cnt{font-size:30px}
+.cheer{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;width:100%}
+.ch-b{background:var(--panel);border:3px solid var(--pc);border-radius:16px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:2px;font:inherit;color:inherit;cursor:pointer}
+.ch-b svg{width:70px;height:70px}.ch-b:active,.ch-b.sent{animation:chpulse .8s}
+@keyframes chpulse{30%{transform:scale(1.12);box-shadow:0 0 0 6px #FFE15A,0 0 30px #FFE15A}}
+.al-rec{font-size:12.5px;color:#7a5a00;background:#FFF3C4;border:2px dashed #FFC93C;border-radius:10px;padding:4px 8px;margin-bottom:8px}
+.btn.rec{position:relative;box-shadow:0 0 0 3px #FFE15A,0 4px 0 rgba(74,52,40,.25);animation:recp 1.3s ease-in-out infinite}
+.btn .rb{position:absolute;top:-11px;right:-6px;font-style:normal;font-size:11px;background:#FFE15A;color:var(--ink);border:2px solid var(--line);border-radius:9px;padding:0 5px}
+@keyframes recp{50%{transform:scale(1.04)}}
+.statup{position:fixed;inset:0;z-index:95;display:flex;align-items:center;justify-content:center;background:rgba(30,18,10,.55);animation:fade .2s}
+.su-burst{position:absolute;width:150vmax;height:150vmax;background:repeating-conic-gradient(from 0deg,rgba(255,225,90,.38) 0 10deg,transparent 10deg 20deg);animation:spinb 7s linear infinite}
+.su-card{position:relative;background:var(--panel);border:4px solid var(--line);border-radius:26px;padding:14px 20px 18px;text-align:center;min-width:250px;animation:popin .45s cubic-bezier(.3,1.6,.5,1)}
+.su-art svg{width:120px;height:120px;animation:winjump .6s ease-in-out 3}
+.su-t{font-size:30px;font-weight:800;color:#FF8A00;text-shadow:0 3px 0 #4A3428;-webkit-text-stroke:1px #4A3428;margin:2px 0 8px}
+.su-l{font-size:18px;margin:5px 0;opacity:0;animation:suin .45s cubic-bezier(.3,1.6,.5,1) forwards}.su-l b{color:#E8442E;font-size:21px}
+@keyframes suin{from{opacity:0;transform:translateX(-30px) scale(.6)}to{opacity:1;transform:none}}
+.emopop{position:fixed;inset:0;z-index:94;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:auto;animation:fade .2s}
+.emopop.joy{background:radial-gradient(circle,rgba(255,225,90,.65),rgba(255,180,60,.25) 60%,transparent)}.emopop.sad{background:radial-gradient(circle,rgba(120,170,255,.6),rgba(60,90,160,.3) 60%,transparent)}
+.ep-e{font-size:120px;line-height:1;animation:popin .4s cubic-bezier(.3,1.6,.5,1),emob 1s ease-in-out .4s infinite}
+.ep-t{margin-top:10px;font-size:22px;font-weight:800;background:#fff;border:3px solid var(--line);border-radius:16px;padding:4px 14px}
+.tear{position:absolute;top:calc(50% - 30px);width:14px;height:20px;background:#5AA9FF;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;animation:tear 1s ease-in infinite}.tear.t1{left:calc(50% - 40px)}.tear.t2{left:calc(50% + 26px);animation-delay:.45s}
+@keyframes tear{from{transform:translateY(0);opacity:1}to{transform:translateY(90px);opacity:0}}
+.pc-emo{font-size:30px;animation:emob 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.pc.cheer image,.pc.cheer>g{filter:drop-shadow(0 0 6px #FFE15A) drop-shadow(0 0 16px #FFD000) brightness(1.25);animation:cheerp .5s ease-in-out 3}
+@keyframes cheerp{50%{filter:drop-shadow(0 0 14px #FFF59A) drop-shadow(0 0 30px #FFD000) brightness(1.5)}}
+.chip.cheer{box-shadow:0 0 0 3px #FFE15A,0 0 22px #FFD000;animation:recp .5s 3}
+.up-t{font-size:20px;color:#E8442E;font-weight:800}
 </style>
 </head>
 <body>
@@ -2695,19 +2741,19 @@ const REGIONS=[
 function regionOf(i){ for(let r=0;r<REGIONS.length;r++){ const R_=REGIONS[r]; if(R_.from<=R_.to){ if(i>=R_.from&&i<=R_.to) return r; } else if(i>=R_.from||i<=R_.to) return r; } return 0; }
 
 // 균형 혜택 (시뮬레이션으로 맞춘 값): [시작 체력 배수, 레벨업 추가 보너스]
-const BEN={"1": [1.49, 5], "2": [1.51, 5], "3": [1.33, 3], "4": [1.0, 0], "5": [1.55, 6], "6": [1.4, 4], "7": [1.33, 3], "8": [1.32, 3], "9": [1.47, 5], "10": [1.48, 5], "11": [1.35, 3], "12": [1.37, 4], "13": [1.48, 5], "14": [1.55, 6], "15": [1.48, 5], "16": [1.21, 2], "17": [1.53, 5], "18": [1.49, 5], "19": [1.34, 3], "20": [1.54, 5]};
+const BEN={"1": [1.4, 4], "2": [1.41, 4], "3": [1.25, 2], "4": [1.0, 0], "5": [1.42, 4], "6": [1.33, 3], "7": [1.33, 3], "8": [1.33, 3], "9": [1.36, 4], "10": [1.35, 4], "11": [1.32, 3], "12": [1.36, 4], "13": [1.53, 5], "14": [1.48, 5], "15": [1.36, 4], "16": [1.2, 2], "17": [1.36, 4], "18": [1.39, 4], "19": [1.33, 3], "20": [1.46, 5]};
 for(const k in BEN){ CHARS[k].hb=BEN[k][0]; CHARS[k].xb=BEN[k][1]; }
 
 Object.assign(TILE_INFO,{
   plain:{ic:'⭐',nm:'일반칸',ds:'아무 효과 없는 기본 칸'},
   atkR:{ic:'🎯',nm:'랜덤 타인 공격',ds:'무작위 상대 1명 공격'},
   atkC:{ic:'🎯',nm:'원하는 캐릭터 공격',ds:'지정한 상대 공격'},
-  duelR:{ic:'⚔️',nm:'랜덤 타인과 대결',ds:'무작위 상대와 1:1 대결'},
-  duelC:{ic:'⚔️',nm:'원하는 캐릭터와 대결',ds:'지정 상대와 1:1 대결'},
+  duelR:{ic:'⚔️',nm:'랜덤 타인과 대결',ds:'무작위 상대와 서로 한 대씩'},
+  duelC:{ic:'⚔️',nm:'원하는 캐릭터와 대결',ds:'고른 상대와 서로 한 대씩'},
   stop:{ic:'🚫',nm:'한 번 이동 불가',ds:'다음 라운드 한 번 움직이지 못함'},
   heal:{ic:'💚',nm:'치료칸',ds:'체력 회복'},
   hurt:{ic:'💥',nm:'공격당함',ds:'피해를 입는 칸'},
-  card:{ic:'❓',nm:'랜덤칸 (치료/공격)',ds:'치료 또는 공격 중 무작위 발동'},
+  card:{ic:'❓',nm:'랜덤칸 (치료/공격)',ds:'회복·기습·대폭발 등 5가지 중 하나'},
   fwd:{ic:'⏩',nm:'주사위 재굴림 전진',ds:'다시 굴려 앞으로 이동'},
   back:{ic:'⏪',nm:'주사위 재굴림 후진',ds:'다시 굴려 뒤로 이동'},
 });
@@ -3298,19 +3344,28 @@ function landOn(s,p,ev,depth){
   else if(ty==='atkR'||ty==='duelR'){ const o=G.opps(s,p); ev.push({e:'tile',p:p.id,ty}); if(o.length) tileHit(s,p,RNG.pick(o),ty==='atkR'?'atk':'duel',ev); }
   else if(ty==='atkC'||ty==='duelC'){ const o=G.opps(s,p); const mode=ty==='atkC'?'atk':'duel'; ev.push({e:'tile',p:p.id,ty});
     if(o.length===1) tileHit(s,p,o[0],mode,ev); else if(o.length>1){ s.pd={k:'tile',mode}; return 'wait'; } }
-  else if(ty==='fwd'||ty==='back'){ const d=G.dice(p); const r=d.fs.map(q=>RNG.d(q)); ev.push({e:'tile',p:p.id,ty}); ev.push({e:'xroll',p:p.id,d:r,f:d.f,fs:d.fs,x:1,why:ty});
+  else if(ty==='fwd'||ty==='back'){ p.emo=s.round*10+(ty==='fwd'?1:2); const d=G.dice(p); const r=d.fs.map(q=>RNG.d(q)); ev.push({e:'tile',p:p.id,ty}); ev.push({e:'xroll',p:p.id,d:r,f:d.f,fs:d.fs,x:1,why:ty});
     let n=sumArr(r); if(ty==='fwd') moveBy(s,p,n,ev,'dash'); else { n=Math.min(n,p.pos); if(n>0){ const from=p.pos; p.pos-=n; ev.push({e:'move',p:p.id,from,n:-n,k:'back'}); } }
     if(depth<1&&s.st==='play') return landOn(s,p,ev,depth+1); }
   else if(ty==='card'){
+    const k=RNG.pick(['heal','hit','ambush','guard','blast']);
     const n=RULES.cardMin+10*Math.floor(Math.random()*((RULES.cardMax-RULES.cardMin)/10+1));
-    if(Math.random()<0.5){ const v=Math.min(n,p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,k:'heal',v,n}); }
-    else { const v=Math.max(0,Math.min(n,p.hp-1)); p.hp-=v; ev.push({e:'tile',p:p.id,ty,k:'hit',v,n}); }
+    if(k==='heal'){ const v=Math.min(n,p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,k,v,n}); }
+    else if(k==='hit'){ const v=Math.max(0,Math.min(n,p.hp-1)); p.hp-=v; ev.push({e:'tile',p:p.id,ty,k,v,n}); }
+    else if(k==='ambush'){ const o=G.opps(s,p); if(!o.length) return; const A=RNG.pick(o); const d=G.dice(A); const r=RNG.d(d.f);
+      ev.push({e:'tile',p:p.id,ty,k,by:A.id}); ev.push({e:'xroll',p:A.id,d:[r],f:d.f,x:1,why:'atk'});
+      strike(s,A,[p],r*G.atk(A),'tile','기습당함! (방어력 무시)',r+'×공격력',ev,{nodef:1,keep1:1}); }
+    else if(k==='guard'){ const d=G.dice(p); const r=d.fs.map(q=>RNG.d(q)); const sm=sumArr(r), df=G.def(p); const v=Math.min(df*sm,p.mhp-p.hp); p.hp+=v;
+      ev.push({e:'xroll',p:p.id,d:r,f:d.f,fs:d.fs,x:1,why:'heal'}); ev.push({e:'tile',p:p.id,ty,k,v,n:df*sm,df,sm}); }
+    else { const o=G.opps(s,p); ev.push({e:'tile',p:p.id,ty,k}); if(o.length) strike(s,p,o,G.atk(p)*3,'tile','대폭발! (방어력 무시)','공격력×3',ev,{nodef:1,keep1:1}); }
   }
 }
 function tileHit(s,p,t,mode,ev){
   if(mode==='atk'){ const d=G.dice(p); const r=RNG.d(d.f); ev.push({e:'xroll',p:p.id,d:[r],f:d.f,x:1,why:'atk'}); strike(s,p,[t],r*G.atk(p),'tile','기습 공격',r+'×공격력',ev); return; }
   const fa=G.dice(p).f, fb=G.dice(t).f, a=RNG.d(fa), b=RNG.d(fb); ev.push({e:'duel',p:p.id,t:t.id,a,b,fa,fb});
-  if(a>b) strike(s,p,[t],a*G.atk(p),'duel','1:1 대결 승리!',a+'×공격력',ev); else if(b>a) strike(s,t,[p],b*G.atk(t),'duel','1:1 대결 승리!',b+'×공격력',ev);
+  const F=a>=b?[p,t,a]:[t,p,b], S2=a>=b?[t,p,b]:[p,t,a];
+  strike(s,F[0],[F[1]],F[2]*G.atk(F[0]),'duel','대결 · 먼저 한 대!',F[2]+'×공격력',ev);
+  if(s.st==='play'&&S2[0].al&&S2[1].al) strike(s,S2[0],[S2[1]],S2[2]*G.atk(S2[0]),'duel','대결 · 맞받아 한 대!',S2[2]+'×공격력',ev);
 }
 
 function treasure(s,p,ev,depth){
@@ -3327,11 +3382,11 @@ function treasure(s,p,ev,depth){
     else ev.push({e:'tile',p:p.id,ty:'treasure',tr:'heal',v:0}); }
 }
 
-function strike(s,att,tgts,raw,kind,lb,m,ev){
-  const res=[]; const mul=G.sdMul(s);
+function strike(s,att,tgts,raw,kind,lb,m,ev,o){
+  o=o||{}; const res=[]; const mul=G.sdMul(s);
   for(const t of tgts){ if(!t.al) continue; const tc=CHARS[t.cid];
-    if(tc.token&&t.tk>0){ t.tk--; res.push({p:t.id,d:0,r:tc.token.k==='block'?'B':'E',h:t.hp,x:0}); continue; }
-    const dmg=G.dmg(raw*mul,t);
+    if(!o.nodef&&tc.token&&t.tk>0){ t.tk--; res.push({p:t.id,d:0,r:tc.token.k==='block'?'B':'E',h:t.hp,x:0}); continue; }
+    let dmg=o.nodef?Math.max(1,Math.round(raw*mul)):G.dmg(raw*mul,t); if(o.keep1) dmg=Math.max(0,Math.min(dmg,t.hp-1));
     t.hp=Math.max(0,t.hp-dmg); const x=t.hp<=0?1:0; if(x){ t.al=0; s.out.push(t.id); }
     res.push({p:t.id,d:dmg,r:'H',h:t.hp,x});
   }
@@ -3397,9 +3452,10 @@ function peerHostTransport(code){ return new Promise(res=>{ const P=PeerC(); let
   const emit=()=>{ if(cb) cb([...conns.values()].filter(c=>c.open).map(c=>({id:c.id,p:c.p}))); };
   let peer; try{ peer=new P('ank2-'+code, peerOpts()); }catch(e){ t.st='err'; fin(); return; } t.peer=peer;
   peer.on('open',()=>{ t.st='ok'; fin(); onNetChange(); });
+  const hb=setInterval(()=>{ if(peer.destroyed){ clearInterval(hb); return; } for(const c of conns.values()) if(c.open){ try{ c.conn.send({k:'p',p:mine}); }catch(e){} } },4000);
   peer.on('connection',conn=>{ const c={id:conn.peer, conn, open:false, p:{}}; conns.set(conn.peer,c);
     conn.on('open',()=>{ c.open=true; try{ conn.send({k:'p',p:mine}); }catch(e){} emit(); });
-    conn.on('data',d=>{ if(d&&d.k==='p'&&d.p&&typeof d.p==='object'){ c.p=d.p; emit(); } });
+    conn.on('data',d=>{ if(d&&d.k==='p'&&d.p&&typeof d.p==='object'){ if(!c.got){ c.got=1; try{ conn.send({k:'p',p:mine}); }catch(e){} } c.p=d.p; emit(); } });
     const bye=()=>{ if(conns.get(conn.peer)===c){ conns.delete(conn.peer); emit(); } }; conn.on('close',bye); conn.on('error',bye); });
   peer.on('error',err=>{ const ty=err&&err.type; console.warn('peer',ty); if(ty==='unavailable-id'){ t.st='dup'; fin(); } else if(t.st!=='ok'){ t.st='err'; t.err=ty; fin(); } onNetChange(); });
   peer.on('disconnected',()=>{ t.st='re'; onNetChange(); setTimeout(()=>{ try{ if(!peer.destroyed&&peer.disconnected) peer.reconnect(); }catch(e){} },1500); });
@@ -3426,11 +3482,11 @@ function peerClientTransport(code){ const P=PeerC(); let mine={}, cb=null, hostP
 
 function packState(s){ return {q:s.seq, r:s.round, st:s.st, ph:s.ph, ci:s.ci, sub:s.sub||0, o:s.order, w:s.win, fl:[s.fl.att,s.fl.sk], set:[s.set.hp,s.set.range,s.set.sd],
   R:Object.keys(s.rolls).map(k=>{ const r=s.rolls[k]; return [+k,r.d,r.f,r.b,r.c,r.fs,r.st?1:0]; }),
-  P:s.players.map(p=>[p.name,p.cid,p.own,p.pos,p.lap,p.lv,p.hp,p.mhp,p.sk,p.skl,p.tk,p.al,p.pv,p.bp,p.ab,p.db,p.dx,p.stun||0]), pk:s.pd?s.pd.k+':'+(s.pd.mode||''):'' }; }
+  P:s.players.map(p=>[p.name,p.cid,p.own,p.pos,p.lap,p.lv,p.hp,p.mhp,p.sk,p.skl,p.tk,p.al,p.pv,p.bp,p.ab,p.db,p.dx,p.stun||0,p.emo||0]), pk:s.pd?s.pd.k+':'+(s.pd.mode||''):'' }; }
 function unpackState(g){ if(!g||!Array.isArray(g.P)||!Array.isArray(g.set)) return null; const rolls={}; (g.R||[]).forEach(r=>{ rolls[r[0]]={d:r[1]||[],f:r[2],b:r[3],c:r[4],fs:Array.isArray(r[5])?r[5]:null,st:r[6]?1:0}; });
   return {v:2, seq:g.q, round:g.r, st:g.st, ph:g.ph, ci:g.ci, sub:g.sub||null, order:g.o||[], win:g.w, pd:g.pk?{k:String(g.pk).split(':')[0],mode:String(g.pk).split(':')[1]||''}:null, fl:{att:(g.fl||[])[0]||0, sk:(g.fl||[])[1]||0},
     set:{hp:g.set[0],range:g.set[1],sd:g.set[2]}, rolls, out:[],
-    players:g.P.map((a,i)=>({id:i,name:String(a[0]),cid:+a[1]||1,own:a[2],pos:a[3]|0,lap:a[4]|0,lv:a[5]|0,hp:a[6]|0,mhp:a[7]||1,sk:a[8]|0,skl:a[9]|0,tk:a[10]|0,al:a[11]|0,pv:a[12]|0,bp:a[13]|0,ab:a[14]|0,db:a[15]|0,dx:a[16]|0,stun:a[17]|0})) }; }
+    players:g.P.map((a,i)=>({id:i,name:String(a[0]),cid:+a[1]||1,own:a[2],pos:a[3]|0,lap:a[4]|0,lv:a[5]|0,hp:a[6]|0,mhp:a[7]||1,sk:a[8]|0,skl:a[9]|0,tk:a[10]|0,al:a[11]|0,pv:a[12]|0,bp:a[13]|0,ab:a[14]|0,db:a[15]|0,dx:a[16]|0,stun:a[17]|0,emo:a[18]|0})) }; }
 
 // ---------- 호스트 (메인 화면) ----------
 const HOST={t:null, on:new Set(), gone:{}, seen:{}, ack:{}, rej:{}, kick:{}, jn:{}, last:'', err:'', pubT:0};
@@ -3473,6 +3529,7 @@ function hostOnPeers(list){ const cls=list.filter(x=>x.p&&x.p.app===APPID&&x.p.r
     HOST.seen[dev]=A.id; HOST.ack[dev]=A.id; ch=true; hostRemoteAct(dev,A.a); }
   if(ch) hostPublish(); if(APP.scr==='game') renderChips(); }
 function hostRemoteAct(dev,a){ const S=APP.S; if(!S||!a||typeof a!=='object') return; const p=S.players[a.p]; if(!p||p.own!==dev) return;
+  if(a.t==='cheer'){ if(p.al) return; const now=Date.now(); HOST.cht=HOST.cht||{}; if(now-(HOST.cht[dev]||0)<600) return; HOST.cht[dev]=now; const T=S.players[+a.x]; if(T&&T.al&&APP.scr==='game') cheerFx(p.id,T.id); return; }
   let act=null; const t=a.t;
   if(t==='roll'){ if(a.r!==S.round) return; act={t:'roll',p:p.id,sk:a.sk?1:0}; }
   else if(['attack','pick','skill','end','alloc'].includes(t)){ if(a.q!==S.seq||ANIM.busy) return; act={t,p:p.id};
@@ -3513,7 +3570,7 @@ function clOnPeers(list){ const hosts=list.filter(x=>x.p&&x.p.app===APPID&&x.p.r
   let h=null; if(CL.code) h=hosts.find(x=>x.id===CL.hostPeer&&x.p.c===CL.code)||hosts.find(x=>x.p.c===CL.code)||null;
   CL.hostPeer=h?h.id:null; CL.hp=h?h.p:null;
   if(h&&CL.pend&&h.p.ack&&h.p.ack[APP.dev]===CL.pend.id){ CL.pend=null; CL.ui=null; clPublish(); }
-  CL.g=(h&&h.p.st==='game')?unpackState(h.p.g):null;
+  CL.g=(h&&h.p.st==='game')?unpackState(h.p.g):null; clWatch();
   renderClient(); }
 function clAct(a){ if(CL.pend) return; CL.n++; CL.pend={id:CL.sid+CL.n, a}; CL.pendT=Date.now(); clPublish(); renderClient();
   const id=CL.pend.id; setTimeout(()=>{ if(CL.pend&&CL.pend.id===id){ CL.pend=null; clPublish(); renderClient(); toast('응답이 없어요. 다시 눌러 주세요'); } },8000); }
@@ -3610,7 +3667,7 @@ function rulesHTML(){ const s=APP.S?APP.S.set:APP.set; const pc=k=>Math.round(RU
   <h3>🎲 한 라운드</h3><ul><li>모두 <b>동시에</b> 주사위를 굴리고, 모든 말이 한꺼번에 이동해요.</li><li>그다음 <b>맨 앞에 있는 사람부터</b> 차례로 특수상황을 진행해요: 콤보 → 도착한 칸 → 보너스 · 공격 · 스킬.</li><li>메인 화면 하나로 할 때는 메인에서 모두 진행하고, 폰을 연결하면 각자 폰에서 굴리고 골라요.</li></ul>
   <h3>⚔️ 공격</h3><ul><li>일반 공격: ${s.range>=50?'거리 상관없이':'앞뒤 '+s.range+'칸 안의'} 상대 1명에게 <b>주사위 1개 × 공격력</b>.</li><li>받는 피해는 방어력만큼 줄어요 (방어력 50 → 75%, 100 → 60%, 200 → 43%).</li><li>💨 회피나 🛡️ 막기가 남아 있으면 상대 공격 한 번을 막아요.</li></ul>
   <h3>⭐ 레벨 업 (한 바퀴 = 100칸)</h3><ul><li>한 바퀴 돌 때마다 레벨 +1 (최대 Lv${MAX_LV})</li><li>보너스 <b>${RULES.bonus}점</b>을 공격력·방어력에 넣거나, ${RULES.diceCost}점을 써서 <b>주사위 1개의 눈 +1</b> (영구 · 예: 6눈 2개 → 7눈 1개 + 6눈 1개)</li><li>적마 · 양 · 돼지 · 상어 · 익룡은 +${RULES.bonusWeak}점 더</li><li>🎁 <b>균형 혜택</b>: 모든 캐릭터의 승률이 같아지도록 캐릭터마다 시작 체력과 레벨업 보너스를 조금씩 더 줘요 (도감에서 확인)</li><li>그 밖에: 최대 체력 +${pc('hpGrow')}%, 체력 ${pc('lapHeal')}% 회복, 스킬 · 회피 · 막기 충전</li></ul>
-  <h3>🗺️ 이동 칸 (지도의 절반이 이벤트 칸)</h3><ul><li>⭐ <b>일반칸</b> — 아무 효과 없는 기본 칸</li><li>🎯 <b>랜덤 타인 공격</b> — 무작위 상대 1명을 공격 (주사위 1개 × 공격력)</li><li>🎯 <b>원하는 캐릭터 공격</b> — 고른 상대를 공격</li><li>⚔️ <b>랜덤 타인과 대결</b> — 무작위 상대와 1:1 주사위 대결, 이긴 쪽이 공격</li><li>⚔️ <b>원하는 캐릭터와 대결</b> — 고른 상대와 1:1 대결</li><li>🚫 <b>한 번 이동 불가</b> — 다음 라운드 한 번 움직이지 못해요</li><li>💚 <b>치료칸</b> — 체력 회복</li><li>💥 <b>공격당함</b> — 체력 5% 피해 (이 칸에서는 쓰러지지 않아요)</li><li>❓ <b>랜덤칸 (치료/공격)</b> — 🧙 도인이 +100~1000 회복 / 🥷 괴한이 -100~1000</li><li>⏩ <b>주사위 재굴림 전진</b> — 다시 굴려 그만큼 앞으로</li><li>⏪ <b>주사위 재굴림 후진</b> — 다시 굴려 그만큼 뒤로</li><li>🌈 무지개 워프: 주사위를 굴릴 때마다 <b>1% 확률</b>로 도착지(출발점)까지 한 번에 이동해서 바로 레벨 업!</li><li>지도 칸의 절반(50칸)이 이벤트 칸이에요</li></ul>
+  <h3>🗺️ 이동 칸 (지도의 절반이 이벤트 칸)</h3><ul><li>⭐ <b>일반칸</b> — 아무 효과 없는 기본 칸</li><li>🎯 <b>랜덤 타인 공격</b> — 무작위 상대 1명을 공격 (주사위 1개 × 공격력)</li><li>🎯 <b>원하는 캐릭터 공격</b> — 고른 상대를 공격</li><li>⚔️ <b>랜덤 타인과 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>⚔️ <b>원하는 캐릭터와 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>🚫 <b>한 번 이동 불가</b> — 다음 라운드 한 번 움직이지 못해요</li><li>💚 <b>치료칸</b> — 체력 회복</li><li>💥 <b>공격당함</b> — 체력 5% 피해 (이 칸에서는 쓰러지지 않아요)</li><li>❓ <b>랜덤칸</b> — 5가지 중 하나: 🧙 도인 회복 100~1000 · 🥷 괴한 -100~1000 · 😈 랜덤 상대에게 방어력 무시 기습당하기 · 🛡️ 방어력 × 내 주사위 합만큼 회복 · 💣 나를 뺀 모두에게 방어력 무시 공격력×3 (이 칸 때문에 쓰러지는 일은 없어요)</li><li>⏩ <b>주사위 재굴림 전진</b> — 다시 굴려 그만큼 앞으로</li><li>⏪ <b>주사위 재굴림 후진</b> — 다시 굴려 그만큼 뒤로</li><li>🌈 무지개 워프: 주사위를 굴릴 때마다 <b>1% 확률</b>로 도착지(출발점)까지 한 번에 이동해서 바로 레벨 업!</li><li>지도 칸의 절반(50칸)이 이벤트 칸이에요</li></ul>
   <h3>🔥 대혼전</h3><p>${s.sd>0?`${s.sd}라운드부터 모든 공격 피해가 매 라운드 +${pc('sdStep')}%씩 커져요. 게임 설정에서 끌 수 있어요.`:'이번 게임은 대혼전이 꺼져 있어요.'}</p></div>`; }
 function menuHTML(){ const hostish=APP.role!=='client';
   return `<div class="sheet-h"><b>☰ 메뉴</b><button class="ib" data-act="closeSheet" aria-label="닫기">✕</button></div><div class="sheet-b"><div class="mrow">
@@ -3655,10 +3712,10 @@ function dockRoll(S){ const need=G.needRoll(S); const mine=need.filter(isLocalP)
   return h; }
 function tgtBtn(S,p,t,k){ const d=G.dist(p.pos,t.pos); const c=CHARS[t.cid]; const tk=c.token&&t.tk>0?(c.token.k==='block'?` · 🛡${t.tk}`:` · 💨${t.tk}`):'';
   return `<button class="tgt" style="--pc:${pcol(t.id)}" data-act="${k}" data-x="${t.id}"><span class="av">${charSVG(t.cid,'head')}</span><span class="tg-t"><b>${esc(t.name)}</b><small>❤️${fmt(t.hp)} · 🛡${G.def(t)}${tk} · ${d}칸</small></span></button>`; }
-function allocHTML(p,act){ const b=p.bp, cost=RULES.diceCost;
-  return `<div class="alloc"><div class="dk-q">⭐ 레벨 업 보너스 <b>${b}점</b>을 써 주세요 <small>(지금 ⚔️${G.atk(p)} 🛡️${G.def(p)} 🎲${diceLbl(p)})</small></div><div class="al-b">
-  <button class="btn sm candy" data-act="${act}" data-k="atk">⚔️ 공격력 +${b}</button><button class="btn sm sky" data-act="${act}" data-k="def">🛡️ 방어력 +${b}</button>
-  ${b>=2?`<button class="btn sm ghost" data-act="${act}" data-k="half">⚔️+${Math.ceil(b/2)} 🛡️+${Math.floor(b/2)}</button>`:''}<button class="btn sm sun" data-act="${act}" data-k="dice" ${b<cost?'disabled':''}>🎲 주사위 눈 +1 (${cost}점)</button></div></div>`; }
+function allocHTML(p,act){ const b=p.bp, cost=RULES.diceCost; const rc=recAlloc(p); const R=k=>rc[0]===k?' rec':''; const B=k=>rc[0]===k?'<em class="rb">👍 추천</em>':'';
+  return `<div class="alloc"><div class="dk-q">⭐ 레벨 업 보너스 <b>${b}점</b>을 써 주세요 <small>(지금 ⚔️${G.atk(p)} 🛡️${G.def(p)} 🎲${diceLbl(p)})</small></div><div class="al-rec">👍 추천: ${rc[1]}</div><div class="al-b">
+  <button class="btn sm candy${R('atk')}" data-act="${act}" data-k="atk">${B('atk')}⚔️ 공격력 +${b}</button><button class="btn sm sky${R('def')}" data-act="${act}" data-k="def">${B('def')}🛡️ 방어력 +${b}</button>
+  ${b>=2?`<button class="btn sm ghost" data-act="${act}" data-k="half">⚔️+${Math.ceil(b/2)} 🛡️+${Math.floor(b/2)}</button>`:''}<button class="btn sm sun${R('dice')}" data-act="${act}" data-k="dice" ${b<cost?'disabled':''}>${B('dice')}🎲 주사위 눈 +1 (${cost}점)</button></div></div>`; }
 function allocAct(p,k){ const b=p.bp; if(k==='atk') return {t:'alloc',p:p.id,a:b,d:0,x:0}; if(k==='def') return {t:'alloc',p:p.id,a:0,d:b,x:0};
   if(k==='half') return {t:'alloc',p:p.id,a:Math.ceil(b/2),d:Math.floor(b/2),x:0}; return {t:'alloc',p:p.id,a:0,d:0,x:1}; }
 function dockRes(S){ const p=G.cur(S); if(!p) return '<div class="dk-cap">…</div>'; const c=CHARS[p.cid]; const ty=TT[p.pos];
@@ -3698,13 +3755,23 @@ function joinHTML(){ const mode=netMode(); const h=CL.hp; let body='';
       <div class="mini" style="margin-top:14px">${L.length?L.map((r,i)=>`<div class="mini-r" style="--pc:${pcol(i)}"><i class="dot"></i><span>${esc(r[0])}</span><small>${esc((CHARS[r[1]]||{}).name||'')}${r[2]===APP.dev?' (나)':''}</small></div>`).join(''):'<p class="note">아직 아무도 없어요</p>'}</div></div>`; }
   else { const g=unpackState(h.g); body=`<div class="card"><p>이미 게임이 진행 중이에요. 다음 판에 참가해 주세요!</p>${g?miniBoard(g,null):''}</div>`; }
   return `<div class="scr join"><div class="bar"><button class="ib" data-act="home" aria-label="뒤로">←</button><h2>🙋 폰으로 참가하기</h2></div><div class="join-b scroll">${body}</div></div>`; }
+function heroHTML(g,me){ const c=CHARS[me.cid];
+  const em=(me.emo&&Math.floor(me.emo/10)===g.round)?(me.emo%10===1?'<div class="emo e-joy">😆<small>신나요!</small></div>':'<div class="emo e-sad">😭<small>흑흑…</small></div>'):'';
+  const tk=c.token?`<span>${c.token.k==='block'?'🛡️ 막기':'💨 회피'} <b>${me.tk}</b></span>`:''; const sk=c.skill?`<span>✨ 스킬 <b>${me.sk>=1?'준비':'충전 중'}</b></span>`:'';
+  return `<div class="hero"><div class="hero-art"><div class="ha-in">${charSVG(me.cid,'full')}</div>${em}</div><div class="hero-i"><div class="hero-n"><b>${esc(me.name)}</b><em>Lv ${me.lv}</em>${me.bp>0?`<em class="bp">⭐ ${me.bp}점</em>`:''}</div>
+  <div class="hp big ${hpCls(me)}"><i style="width:${Math.max(0,me.hp/me.mhp*100)}%"></i><span>❤️ ${fmt(me.hp)} / ${fmt(me.mhp)}</span></div>
+  <div class="stg"><span>⚔️ 공격력 <b>${G.atk(me)}</b></span><span>🛡️ 방어력 <b>${G.def(me)}</b></span><span class="w">🎲 주사위 <b>${diceLbl(me)}</b></span>${tk}${sk}</div></div></div>`; }
+function othersHTML(g,me){ const ps=g.players.filter(p=>p.id!==me.id).sort((a,b)=>(b.al-a.al)||(b.hp-a.hp));
+  return `<div class="oth"><div class="oth-h">다른 기사들 체력</div>${ps.map(p=>`<div class="oth-r ${p.al?'':'dead'}" style="--pc:${pcol(p.id)}"><span class="av">${charSVG(p.cid,'head')}</span><span class="oth-n">${esc(p.name)}</span><div class="hp ${hpCls(p)}"><i style="width:${p.al?Math.max(0,p.hp/p.mhp*100):0}%"></i></div><small>${p.al?fmt(p.hp):'탈락'}</small></div>`).join('')}</div>`; }
 function ctrlHTML(){ const g=CL.g, hp=CL.hp||{}; const me=clMe(); const c=CHARS[me.cid]; const busy=!!hp.busy, pend=!!CL.pend; let m='';
   if(g.st==='end'){ const w=g.players[g.win]; m=`<div class="cm-big">${w&&w.id===me.id?'🏆 우승!':'🎉 게임 끝!'}</div><p class="cm-w">${w?esc(w.name)+' 님이 이겼어요':''}</p>`; }
-  else if(!me.al) m=`<div class="cm-big">😵 탈락했어요</div><p class="cm-w">메인 화면에서 응원해 주세요!</p>`;
+  else if(!me.al){ const left=Math.max(0,20-Math.floor((Date.now()-(CL.deadAt||Date.now()))/1000));
+    if(left>0) return `<div class="scr ctrl gray" style="--pc:${pcol(me.id)}">${heroHTML(g,me)}<div class="ctrl-m"><div class="cm-big">😵</div><div class="cm-t">탈락했어요…</div><p class="cm-w"><b class="cnt">${left}</b>초 뒤에 다른 기사를 응원할 수 있어요</p></div><div class="ctrl-b">${othersHTML(g,me)}</div></div>`;
+    m=`<div class="cm-t">📣 응원할 기사를 눌러 주세요!</div><p class="cm-w">누르면 메인 화면에서 그 기사가 반짝 빛나요</p><div class="cheer">${G.alive(g).map(p=>`<button class="ch-b" style="--pc:${pcol(p.id)}" data-act="clCheer" data-x="${p.id}" ${pend?'disabled':''}>${charSVG(p.cid,'full')}<b>${esc(p.name)}</b></button>`).join('')}</div>`; }
   else if(g.ph==='roll'){ const r=g.rolls[me.id];
     if(r&&r.st) m=`<div class="cm-big">🚫</div><p class="cm-w">이번 라운드는 움직일 수 없어요 (이동 불가 칸)</p>`;
     else if(r){ const hv=r.c?comboVals(c.combo,r.d):[]; m=`<div class="cm-t">내 주사위</div><div class="dice">${r.d.map((v,i)=>dieHTML(v,fOf(r,i),'big'+(hv.includes(v)?' hl':''))).join('')}</div><div class="cm-sum">${sumArr(r.d)}칸 이동${r.c?' · 💥 '+esc(c.combo.nm):''}${r.b?' · 🦈 광란':''}</div><p class="cm-w">다른 플레이어를 기다리는 중… (${Object.keys(g.rolls).length}/${g.players.filter(p=>p.al).length})</p>`; }
-    else { const sh=G.canPre(g,me); m=`<div class="cm-t">라운드 ${g.round} · 주사위를 굴려요!</div>${sh?`<label class="tog big"><input type="checkbox" data-act="clSharkTog" ${CL.sk?'checked':''}> 🦈 광란의 질주 쓰기 (주사위 ${G.dice(me).n*2}개)</label>`:''}<button class="btn sun rollbtn" data-act="clRoll" ${pend?'disabled':''}>🎲<br>굴리기!</button><p class="cm-w">주사위 ${diceLbl(me)}</p>`; } }
+    else { const sh=G.canPre(g,me); m=`<div class="cm-t">라운드 ${g.round} · 주사위를 굴려요!</div>${sh?`<label class="tog big"><input type="checkbox" data-act="clSharkTog" ${CL.sk?'checked':''}> 🦈 광란의 질주 쓰기 (주사위 ${G.dice(me).n*2}개)</label>`:''}<button class="btn sun rollbtn" data-act="clRoll" ${pend?'disabled':''}>🎲<br>굴리기!</button>`; } }
   else if(g.ph==='res'){ const cur=G.cur(g);
     if(cur&&cur.id===me.id){
       if(busy||pend) m=`<div class="cm-t">내 차례!</div><p class="cm-w">👀 메인 화면을 봐 주세요…</p>`;
@@ -3713,9 +3780,30 @@ function ctrlHTML(){ const g=CL.g, hp=CL.hp||{}; const me=clMe(); const c=CHARS[
         if(CL.ui==='atk'&&cA) m=`<div class="cm-t">⚔️ 누구를 공격할까요?</div><div class="tgts">${G.inRange(g,me).map(t=>tgtBtn(g,me,t,'clAttack')).join('')}</div><button class="btn ghost" data-act="clBack">← 돌아가기</button>`;
         else m=`<div class="cm-t">내 차례! 무엇을 할까요?</div>${G.canAlloc(g,me)?allocHTML(me,'clAlloc'):''}<div class="acts">${cA?`<button class="btn big candy" data-act="clAtkUi">⚔️ 일반 공격<small>${G.inRange(g,me).length}명 공격 가능</small></button>`:''}${cS?`<button class="btn big grape" data-act="clSkill">✨ ${esc(c.skill.nm)}<small>${esc(c.skill.ds)}</small></button>`:''}<button class="btn big ghost" data-act="clEnd">✅ 끝내기</button></div>`; } }
     else m=`<div class="cm-t">${cur?esc(cur.name)+' 님 차례':'진행 중…'}</div><p class="cm-w">메인 화면에서 진행 중이에요</p>`; }
-  const tk=c.token?` · ${c.token.k==='block'?'🛡️막기':'💨회피'} ${me.tk}`:''; const sk=c.skill?` · ✨${me.sk>=1?'스킬 준비':'충전 중'}`:'';
-  return `<div class="scr ctrl" style="--pc:${pcol(me.id)}"><div class="ctrl-h"><div class="av big">${charSVG(me.cid,'head')}</div><div class="ch-i"><b>${esc(me.name)}</b> <small>Lv${me.lv} · ${esc(c.name)}${me.bp>0?' · ⭐'+me.bp+'점':''}</small><div class="hp ${hpCls(me)}"><i style="width:${Math.max(0,me.hp/me.mhp*100)}%"></i></div><small>체력 ${fmt(me.hp)} / ${fmt(me.mhp)} · ⚔️${G.atk(me)} 🛡️${G.def(me)}${tk}${sk}</small></div></div>
-  <div class="ctrl-m scroll">${m}</div><div class="ctrl-b">${miniBoard(g,me)}${(Array.isArray(hp.lg)&&hp.lg.length)?`<div class="mini-log">${hp.lg.map(esc).join('<br>')}</div>`:''}</div></div>`; }
+  return `<div class="scr ctrl" style="--pc:${pcol(me.id)}">${heroHTML(g,me)}<div class="ctrl-m scroll">${m}</div><div class="ctrl-b">${othersHTML(g,me)}</div></div>`; }
+// 폰: 능력치 상승 · 기쁨/눈물 · 탈락 타이머 감지
+function clWatch(){ const g=CL.g, me=clMe(); if(!g||!me){ CL.pst=null; return; }
+  if(!me.al&&!CL.deadAt){ CL.deadAt=Date.now(); clearInterval(CL.dT); CL.dT=setInterval(()=>{ _lastCl=''; renderClient(); if(Date.now()-CL.deadAt>21000) clearInterval(CL.dT); },1000); try{ navigator.vibrate&&navigator.vibrate(400); }catch(e){} }
+  if(me.al) CL.deadAt=0;
+  const fs=G.dice(me).fs; const st={id:me.id,lv:me.lv,atk:G.atk(me),def:G.def(me),dsum:fs.reduce((a,b)=>a+b,0),dl:diceLbl(me),emo:me.emo||0}; const pv=CL.pst; CL.pst=st;
+  if(!pv||pv.id!==st.id) return; const L=[];
+  if(st.lv>pv.lv) L.push(`⭐ 레벨 업! <b>Lv ${pv.lv} → ${st.lv}</b>`);
+  if(st.atk>pv.atk) L.push(`⚔️ 공격력 <b>${pv.atk} → ${st.atk}</b>`);
+  if(st.def>pv.def) L.push(`🛡️ 방어력 <b>${pv.def} → ${st.def}</b>`);
+  if(st.dsum>pv.dsum) L.push(`🎲 주사위 <b>${pv.dl} → ${st.dl}</b>`);
+  if(L.length) statUp(L,me);
+  if(st.emo!==pv.emo&&st.emo&&Math.floor(st.emo/10)===g.round) emoPop(st.emo%10===1); }
+function statUp(L,me){ $$('.statup').forEach(x=>x.remove()); const el=document.createElement('div'); el.className='statup';
+  el.innerHTML=`<div class="su-burst"></div><div class="su-card"><div class="su-art">${charSVG(me.cid,'full')}</div><div class="su-t">능력치 UP!</div>${L.map((l,i)=>`<div class="su-l" style="animation-delay:${.25+i*.18}s">${l}</div>`).join('')}</div>`;
+  el.onclick=()=>el.remove(); $('#app').appendChild(el); sfx('lvl'); try{ navigator.vibrate&&navigator.vibrate([60,40,120]); }catch(e){} setTimeout(()=>el.remove(),3000); }
+function emoPop(joy){ const el=document.createElement('div'); el.className='emopop '+(joy?'joy':'sad');
+  el.innerHTML=`<div class="ep-e">${joy?'😆':'😭'}</div><div class="ep-t">${joy?'신나요! 앞으로 쭉쭉!':'흑흑… 뒤로 밀렸어요'}</div>${joy?'':'<i class="tear t1"></i><i class="tear t2"></i>'}`;
+  el.onclick=()=>el.remove(); $('#app').appendChild(el); setTimeout(()=>el.remove(),2200); }
+function recAlloc(p){ const hr=p.hp/p.mhp, fs=G.dice(p).fs;
+  if(hr<0.45) return ['def','체력이 낮아요. 방어력을 올려 오래 버티세요'];
+  if(p.bp>=RULES.diceCost&&fs.length===1&&fs[0]<9) return ['dice','주사위가 1개라 눈을 키우면 이동과 공격이 함께 세져요'];
+  if(G.def(p)<G.atk(p)*0.6) return ['def','방어력이 낮은 편이라 방어를 올리면 오래 살아남아요'];
+  return ['atk','공격력을 올려서 상대를 빨리 쓰러뜨려요']; }
 
 // ---------- 버튼 동작 ----------
 const ACT={
@@ -3770,6 +3858,7 @@ const ACT={
   clPick(el){ const me=clMe(); if(me) clAct({t:'pick',p:me.id,x:+el.dataset.x,q:CL.g.seq}); },
   clSkill(){ const me=clMe(); if(me) clAct({t:'skill',p:me.id,q:CL.g.seq}); },
   clEnd(){ const me=clMe(); if(me) clAct({t:'end',p:me.id,q:CL.g.seq}); },
+  clCheer(el){ const me=clMe(); if(!me) return; el.classList.add('sent'); setTimeout(()=>el.classList.remove('sent'),900); clAct({t:'cheer',p:me.id,x:+el.dataset.x}); },
   clAlloc(el){ const me=clMe(); if(!me) return; const a=allocAct(me,el.dataset.k); a.q=CL.g.seq; clAct(a); },
 };
 // ===================== ANIM : 메인 화면 연출 · 카메라 · 소리 =====================
@@ -3795,8 +3884,9 @@ function applyEv(D,e){ const P=(e.p!=null&&e.p>=0)?D.players[e.p]:null;
     case 'lap': Object.assign(P,{lv:e.lv,sk:e.sk,skl:e.skl,tk:e.tk,mhp:e.mhp,lap:e.lap}); P.hp=Math.min(P.mhp,P.hp+(e.h||0)); if(e.bp!=null) P.bp=e.bp; break;
     case 'order': D.order=e.o.slice(); D.ph='res'; D.ci=-1; break;
     case 'step': D.ci=e.i; D.sub=null; break;
+    case 'xx_noop': break;
     case 'move': P.pos=((e.from+e.n)%BOARD_N+BOARD_N)%BOARD_N; break;
-    case 'tile': if(e.ty==='heal'||(e.ty==='card'&&e.k==='heal')||(e.ty==='treasure'&&e.tr==='heal')) P.hp=Math.min(P.mhp,P.hp+(e.v||0));
+    case 'tile': if(e.ty==='heal'||(e.ty==='card'&&(e.k==='heal'||e.k==='guard'))||(e.ty==='treasure'&&e.tr==='heal')) P.hp=Math.min(P.mhp,P.hp+(e.v||0));
       else if(e.ty==='trap'||e.ty==='hurt'||(e.ty==='card'&&e.k==='hit')) P.hp=Math.max(1,P.hp-(e.v||0));
       else if(e.ty==='treasure'&&e.tr==='skill'){ P.sk=1; P.skl=0; } else if(e.ty==='treasure'&&e.tr==='token') P.tk++; break;
     case 'skill': if(P) P.sk=0; break;
@@ -3823,7 +3913,7 @@ async function playEv(e,hasMA){ const D=ANIM.D; const P=(e.p!=null&&e.p>=0)?D.pl
     case 'tile': applyEv(D,e); renderChips(); updPcHP(e.p); await tileFx(e,P); break;
     case 'skill': applyEv(D,e); renderChips(); sfx('combo'); log(`✨ ${P.name} 스킬: ${e.nm}`); await banner('✨ 스킬!',esc(e.nm),P,1000); break;
     case 'atk': await battle(e); applyEv(D,e); renderChips(); renderPieces(D); break;
-    case 'alloc': { applyEv(D,e); renderChips(); sfx('pop'); const t=(e.a?`⚔️ 공격력 +${e.a} `:'')+(e.d?`🛡️ 방어력 +${e.d} `:'')+(e.x?'🎲 주사위 눈 +1':''); log(`⭐ ${P.name}: ${t}`); await fxToast(`⭐ ${nm} ${t}`,800); break; }
+    case 'alloc': { applyEv(D,e); renderChips(); sfx('pop'); const t=(e.a?`⚔️ 공격력 +${e.a} `:'')+(e.d?`🛡️ 방어력 +${e.d} `:'')+(e.x?'🎲 주사위 눈 +1':''); log(`⭐ ${P.name}: ${t}`); await banner('⭐ 능력치 UP!',`<span class="up-t">${t}</span>`,P,1150); break; }
     case 'win': applyEv(D,e); renderChips(); log(`🏆 ${P?P.name:'무승부'} 승리!`); await winFx(e); break;
     case 'round': applyEv(D,e); renderTop(); renderChips(); markCur(); log(`— 라운드 ${e.r} —`); break;
     case 'sd': sfx('combo'); log('🔥 대혼전 시작!'); await banner('🔥 대혼전 시작!',`이제부터 모든 공격 피해가<br>매 라운드 +${Math.round(RULES.sdStep*100)}%씩 커져요`,null,1900); break;
@@ -3854,10 +3944,11 @@ async function xrollPop(e){ const lb={fwd:'🎲 재굴림 전진!',back:'🎲 �
 const TILE_LINE={atkR:'🎯 랜덤 타인 공격!',atkC:'🎯 원하는 캐릭터 공격!',duelR:'⚔️ 랜덤 타인과 대결!',duelC:'⚔️ 원하는 캐릭터와 대결!',stop:'🚫 한 번 이동 불가!',heal:'💚 치료칸!',hurt:'💥 공격당함!',card:'❓ 랜덤칸!',fwd:'⏩ 재굴림 전진!',back:'⏪ 재굴림 후진!'};
 async function tileFx(e,P){ const ty=e.ty; let sub='';
   if(ty==='heal') sub=e.v?`체력 +${fmt(e.v)}`:'체력이 가득해요'; else if(ty==='hurt') sub=`체력 -${fmt(e.v)}`; else if(ty==='stop') sub='다음 라운드에 움직일 수 없어요';
-  else if(ty==='fwd') sub='주사위를 다시 굴려 앞으로!'; else if(ty==='back') sub='주사위를 다시 굴려 뒤로…'; else if(ty==='atkR'||ty==='duelR') sub='상대를 무작위로 정해요'; else if(ty==='atkC'||ty==='duelC') sub='상대를 직접 골라요';
+  else if(ty==='fwd') sub='😆 주사위를 다시 굴려 앞으로!'; else if(ty==='back') sub='😭 주사위를 다시 굴려 뒤로…'; else if(ty==='atkR'||ty==='duelR') sub='상대를 무작위로 정해요'; else if(ty==='atkC'||ty==='duelC') sub='상대를 직접 골라요';
   if(!TILE_LINE[ty]) return;
   log(`${TILE_LINE[ty]} ${P.name}${sub?' · '+sub:''}`);
-  if(ty==='card'){ await tileScene(ty,P,'❓ 랜덤칸!','치료일까, 공격일까?',850); return cardFx(e); }
+  if(ty==='fwd'||ty==='back') P.emo=ANIM.D.round*10+(ty==='fwd'?1:2);
+  if(ty==='card'){ await tileScene(ty,P,'❓ 랜덤칸!','무엇이 나올까?',850); return cardFx(e,P); }
   await tileScene(ty,P,TILE_LINE[ty],sub,1300,e); }
 async function tileScene(ty,P,t,sub,ms,e){ sfx(ty==='heal'?'heal':ty==='hurt'?'hit':ty==='stop'?'miss':'pop');
   const el=fxAdd(`<div class="tscene t-${ty}"><div class="ts-burst"></div><div class="ts-tile"><img src="${TILEIMG[ty]||TILEIMG.plain}" alt=""></div><div class="ts-char">${charSVG(P.cid,'full')}</div><div class="ts-t">${t}</div><div class="ts-s">${esc(P.name)}${sub?' · '+sub:''}</div></div>`);
@@ -3869,11 +3960,17 @@ async function duelFx(e){ const D=ANIM.D; const A=D.players[e.p], B=D.players[e.
   for(let i=0;i<7;i++){ dd[0].innerHTML=dieHTML(1+Math.floor(Math.random()*e.fa),e.fa,'big tum'); dd[1].innerHTML=dieHTML(1+Math.floor(Math.random()*e.fb),e.fb,'big tum'); await wait(75); }
   dd[0].innerHTML=dieHTML(e.a,e.fa,'big'); dd[1].innerHTML=dieHTML(e.b,e.fb,'big');
   const w=e.a>e.b?'l':e.b>e.a?'r':''; if(w){ el.querySelector('.du-'+w).classList.add('win'); el.querySelector('.du-'+(w==='l'?'r':'l')).classList.add('lose'); }
-  el.querySelector('.du-res').textContent=w?`${w==='l'?A.name:B.name} 승리! 공격!`:'무승부! 아무 일도 없어요';
+  el.querySelector('.du-res').textContent=w?`${w==='l'?A.name:B.name} 먼저! 서로 한 대씩!`:'동점! 서로 한 대씩!';
   sfx(w?'pop':'miss'); log(`⚔️ 대결 ${A.name} ${e.a} : ${e.b} ${B.name}`); await wait(1250); fxDel(el); await wait(150); }
-async function cardFx(e){ const heal=e.k==='heal'; const note=heal?(e.v<e.n?'체력이 가득 찼어요':'에너지를 나눠 줬어요!'):(e.v<e.n?'방어력 무시 기습!<br>(체력 1로 버텼어요)':'방어력 무시 기습!');
-  const el=fxAdd(`<div class="cardfx"><div class="cf"><div class="cf-b">🃏</div><div class="cf-f ${heal?'heal':'hit'}"><div class="big">${heal?'🧙':'🥷'}</div><b>${heal?'신비한 도인':'복면 괴한'}</b><div class="amt">${heal?'+':'-'}${fmt(e.v)}</div><small>${note}</small></div></div></div>`);
-  sfx('card'); await wait(700); sfx(heal?'heal':'hit'); if(e.v) floatTxt(e.p,(heal?'+':'-')+fmt(e.v),heal?'heal':'hit'); await wait(1000); fxDel(el); }
+async function cardFx(e,P){ const D=ANIM.D; const by=e.by!=null?D.players[e.by]:null;
+  const I={heal:['🧙','신비한 도인','+'+fmt(e.v),e.v<e.n?'체력이 가득 찼어요':'에너지를 나눠 줬어요!','heal'],
+    hit:['🥷','복면 괴한','-'+fmt(e.v),'방어력 무시 기습!'+(e.v<e.n?'<br>(체력 1로 버텼어요)':''),'hit'],
+    ambush:['😈','기습당함!',by?esc(by.name)+'의 공격':'','방어력 무시 · 이 칸에선 쓰러지지 않아요','hit'],
+    guard:['🛡️','방어 회복','+'+fmt(e.v),`방어력 ${e.df} × 주사위 ${e.sm} = ${fmt(e.n)}`,'heal'],
+    blast:['💣','대폭발!','모두에게 공격!','나를 뺀 모두 · 공격력×3 · 방어력 무시','hit']}[e.k]||['❓','랜덤','','',''];
+  log(`❓ ${P?P.name:''} 랜덤칸: ${I[1]} ${String(I[2]).replace(/<[^>]+>/g,'')}`);
+  const el=fxAdd(`<div class="cardfx"><div class="cf"><div class="cf-b">🃏</div><div class="cf-f ${I[4]==='heal'?'heal':'hit'}"><div class="big">${I[0]}</div><b>${I[1]}</b><div class="amt">${I[2]}</div><small>${I[3]}</small></div></div></div>`);
+  sfx('card'); await wait(700); sfx(I[4]==='heal'?'heal':'hit'); if((e.k==='heal'||e.k==='guard'||e.k==='hit')&&e.v) floatTxt(e.p,(I[4]==='heal'?'+':'-')+fmt(e.v),I[4]); await wait(1100); fxDel(el); }
 function logAtk(e){ const D=ANIM.D; const A=D.players[e.p]; const parts=e.t.map(t=>{ const T=D.players[t.p]; return t.r==='H'?`${T.name} -${fmt(t.d)}${t.x?' (탈락)':''}`:`${T.name} ${t.r==='B'?'막기':'회피'}`; });
   log(`⚔️ ${A.name}의 ${e.lb}: ${parts.join(', ')||'대상 없음'}`); }
 async function battle(e){ const D=ANIM.D; const A=D.players[e.p]; if(!A) return; const tg=e.t.map(t=>Object.assign({},t,{P:D.players[t.p]})); if(!tg.length) return;
@@ -3896,8 +3993,14 @@ function pcPos(D,p){ const t=TILES[p.pos]; const same=D.players.filter(q=>q.al&&
   if(n<=1||k<0) return {x:t.x,y:t.y}; const a=-Math.PI/2+k/n*Math.PI*2, r=14+n*3; return {x:t.x+Math.cos(a)*r, y:t.y+Math.sin(a)*r*0.55}; }
 function renderPieces(D){ const g=$('#pieces'); if(!g||!D) return;
   for(const p of D.players){ let el=$('#pc'+p.id); if(!el){ g.insertAdjacentHTML('beforeend',pieceSVG(p)); el=$('#pc'+p.id); }
-    el.style.display=p.al?'':'none'; if(!el._mv){ const q=pcPos(D,p); setPc(el,q.x,q.y); } updPcHP(p.id); }
+    el.style.display=p.al?'':'none'; if(!el._mv){ const q=pcPos(D,p); setPc(el,q.x,q.y); } updPcHP(p.id); updEmo(D,p,el); }
   Array.from(g.children).sort((a,b)=>(a._y||0)-(b._y||0)).forEach(c=>g.appendChild(c)); }
+function updEmo(D,p,el){ let t=el.querySelector('.pc-emo'); const on=p.emo&&Math.floor(p.emo/10)===D.round&&(APP.role==='solo'||isLocalP(p));
+  if(!on){ if(t) t.remove(); return; } if(!t){ t=document.createElementNS('http://www.w3.org/2000/svg','text'); t.setAttribute('class','pc-emo'); t.setAttribute('x','26'); t.setAttribute('y','-58'); el.appendChild(t); } t.textContent=p.emo%10===1?'😆':'😭'; }
+function cheerFx(from,to){ const S=APP.S; const A=S.players[from], B=S.players[to]; if(!A||!B) return; const el=$('#pc'+to);
+  if(el){ el.classList.remove('cheer'); void el.getBoundingClientRect(); el.classList.add('cheer'); clearTimeout(el._ct); el._ct=setTimeout(()=>el.classList.remove('cheer'),1900); floatTxt(to,'📣 응원!','lv'); }
+  const ch=document.querySelector(`.chip[data-p="${to}"]`); if(ch){ ch.classList.add('cheer'); setTimeout(()=>ch.classList.remove('cheer'),1900); }
+  toast(`📣 ${esc(A.name)} 님이 <b>${esc(B.name)}</b> 응원!`,1500); sfx('join'); }
 function updPcHP(pid){ const D=ANIM.D; const p=D&&D.players[pid]; const el=$('#pc'+pid); if(!p||!el) return; const r=Math.max(0,p.hp/p.mhp); const f=el.querySelector('.pc-hpf');
   if(f){ f.setAttribute('width',(30.8*r).toFixed(1)); f.setAttribute('fill',r<=.25?'#FF5D73':r<=.5?'#FFC93C':'#3CCFB4'); } }
 function markCur(force){ const D=ANIM.D; const c=(force===-1||!D)?null:G.cur(D); $$('.pc').forEach(e=>e.classList.toggle('cur',!!c&&e.id==='pc'+c.id)); }
