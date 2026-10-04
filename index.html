@@ -384,6 +384,9 @@ input{font:inherit;color:var(--text);-webkit-user-select:text;user-select:text}
 .opp-i .av{width:44px;height:44px;border-radius:50%;border:3px solid var(--pc);overflow:hidden;background:#fff}.opp-i .av svg{width:100%;height:100%}
 .opp-i.dead{filter:grayscale(1);opacity:.5}
 .pv-act{justify-content:flex-start}
+.mm-tag{top:auto;bottom:6px}
+.mm-tile{position:absolute;left:6px;right:6px;top:6px;z-index:2;text-align:center;font-size:13.5px;font-weight:800;line-height:1.25;color:var(--ink);background:#FFF6DE;border:3px solid var(--line);border-radius:12px;padding:4px 6px;box-shadow:0 3px 0 rgba(74,52,40,.3);animation:popin .35s cubic-bezier(.3,1.6,.5,1)}
+.mm-tile.ev{background:#FFE15A}
 </style>
 </head>
 <body>
@@ -4036,7 +4039,7 @@ function pvInner(g,me,m){ const turn=/data-act="(clPick|clAttack|clAlloc|clAtkUi
 function pvWrap(g,me,m,cls){ return `<div class="scr ctrl${cls||''}" style="--pc:${pcol(me.id)}">${pvInner(g,me,m)}</div>`; }
 function mmEnsure(){ if(MM.el) return MM.el; const d=document.createElement('div'); d.className='mm';
   const base=mapSVG().replace('<g id="pieces"></g><g id="fxmap"></g>','');
-  d.innerHTML=`<svg class="mm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">${base}<g class="mm-pcs"></g></svg><div class="mm-tag">📍 내 위치 · 라이브</div>`;
+  d.innerHTML=`<svg class="mm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">${base}<g class="mm-pcs"></g></svg><div class="mm-tag">📍 라이브</div><div class="mm-tile"></div>`;
   MM.el=d; MM.svg=d.querySelector('svg'); MM.g=d.querySelector('.mm-pcs'); return d; }
 function mmSrc(){ if(MM.mode==='one'&&APP.S) return {D:ANIM.D||APP.S, me:meP(APP.S)}; if(MM.mode==='cl'&&CL.g) return {D:CL.g, me:clMe()}; return null; }
 function mmMount(mode){ const ph=document.querySelector('[data-mm]'); if(!ph) return; const el=mmEnsure(); if(el.parentNode!==ph) ph.appendChild(el); MM.mode=mode; mmSync(); if(!MM.raf){ MM.last=performance.now(); MM.raf=requestAnimationFrame(mmLoop); } }
@@ -4057,6 +4060,9 @@ function mmLoop(ts){ if(!MM.el||!MM.el.isConnected){ MM.raf=0; return; } const d
         if(a.u<1){ a.u=Math.min(1,a.u+dt/150); const A=TILES[a.from], B=TILES[a.to]; x=A.x+(B.x-A.x)*a.u; y=A.y+(B.y-A.y)*a.u-Math.sin(Math.PI*a.u)*16; if(a.u>=1) a.t=a.to; }
         else { const q=pcPos(D,p); x=q.x; y=q.y; } }
       el.setAttribute('transform',`translate(${x.toFixed(1)},${y.toFixed(1)})`); if(p.id===s.me.id){ mx=x; my=y; } }
+    { const meA=MM.an[s.me.id]; const pos=MM.mode==='cl'&&meA?(meA.u<1?meA.to:meA.t):D.players[s.me.id].pos; const ty=TT[pos]; const inf=TILE_INFO[ty]||{};
+      const lab=ty==='start'?'🏁 출발점':ty==='plain'?`⭐ ${pos}번 칸 · 일반칸`:`${inf.ic||'✨'} ${pos}번 칸 · ${inf.nm||''}`;
+      if(MM.lab!==lab){ MM.lab=lab; const t=MM.el.querySelector('.mm-tile'); if(t){ t.textContent=lab; t.className='mm-tile '+(ty==='plain'?'':'ev'); t.style.animation='none'; void t.offsetWidth; t.style.animation=''; } } }
     if(mx!=null){ const W=MM.el.clientWidth||200, H=MM.el.clientHeight||200; const vw=Math.max(94,125*W/H), vh=vw*H/W; const tx=mx, ty=my-19;
       if(MM.cx==null){ MM.cx=tx; MM.cy=ty; } MM.cx+=(tx-MM.cx)*0.14; MM.cy+=(ty-MM.cy)*0.14;
       MM.svg.setAttribute('viewBox',`${(MM.cx-vw/2).toFixed(1)} ${(MM.cy-vh/2).toFixed(1)} ${vw} ${vh.toFixed(1)}`); } }
