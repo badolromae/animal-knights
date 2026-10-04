@@ -361,6 +361,28 @@ input{font:inherit;color:var(--text);-webkit-user-select:text;user-select:text}
 .ws-btns .btn{min-width:150px}
 .sheet-bg{z-index:120}.sheet{z-index:121}
 @media (min-aspect-ratio:1/1){.ws-win{top:27%;height:39%}}
+
+/* ===== 개인 화면 3분할 ===== */
+.me-view{display:flex;flex-direction:column}
+.ctrl .hero{flex:none}
+.pv{flex:1;min-height:0;display:grid;grid-template-columns:56% 1fr;gap:8px;padding:4px 10px 8px}
+.pv.turn{grid-template-columns:40% 1fr}
+.pv-map{position:relative;min-height:150px;border:3px solid var(--line);border-radius:20px;overflow:hidden;background:#1d4d78;box-shadow:inset 0 0 0 3px rgba(255,255,255,.15)}
+.mm,.mm-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.mm-tag{position:absolute;left:6px;top:6px;font-size:11px;background:rgba(20,10,5,.6);color:#fff;border-radius:9px;padding:2px 7px}
+.pv-act{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;overflow-y:auto;padding:2px}
+.pv-act>:first-child{margin-top:auto}.pv-act>:last-child{margin-bottom:auto}
+.pv-act .cm-t{font-size:17px;line-height:1.25}.pv-act .cm-w{font-size:13px;margin:0}.pv-act .cm-big{font-size:46px}
+.pv-act .rollbtn{width:min(150px,92%);height:auto;aspect-ratio:1;border-radius:50%;font-size:22px;line-height:1.15;padding:0}
+.pv-act .acts,.pv-act .tgts,.pv-act .alloc,.pv-act .cheer{width:100%}
+.pv-act .acts .btn{font-size:15px;padding:9px 8px}.pv-act .acts .btn small{font-size:10.5px}
+.pv-act .al-b{grid-template-columns:1fr}.pv-act .al-rec,.pv-act .dk-q{font-size:12px}
+.pv-act .tgt{padding:6px 7px}.pv-act .cheer{grid-template-columns:1fr 1fr}.pv-act .ch-b svg{width:54px;height:54px}
+.pv-act .dice .die.big{width:46px;height:46px}
+.opp{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:6px 4px;margin:0 10px calc(10px + env(safe-area-inset-bottom,0px));padding:8px 6px;background:var(--panel);border:3px solid var(--line);border-radius:18px}
+.opp-i{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;min-width:0}
+.opp-i .av{width:44px;height:44px;border-radius:50%;border:3px solid var(--pc);overflow:hidden;background:#fff}.opp-i .av svg{width:100%;height:100%}
+.opp-i.dead{filter:grayscale(1);opacity:.5}
 </style>
 </head>
 <body>
@@ -3604,6 +3626,7 @@ function clOnPeers(list){ const hosts=list.filter(x=>x.p&&x.p.app===APPID&&x.p.r
   CL.hostPeer=h?h.id:null; CL.hp=h?h.p:null;
   if(h&&CL.pend&&h.p.ack&&h.p.ack[APP.dev]===CL.pend.id){ CL.pend=null; CL.ui=null; clPublish(); }
   CL.g=(h&&h.p.st==='game')?unpackState(h.p.g):null; clWatch();
+  if(APP.scr==='ctrl'&&MM.mode==='cl') mmSync();
   renderClient(); }
 function clAct(a){ if(CL.pend) return; CL.n++; CL.pend={id:CL.sid+CL.n, a}; CL.pendT=Date.now(); clPublish(); renderClient();
   const id=CL.pend.id; setTimeout(()=>{ if(CL.pend&&CL.pend.id===id){ CL.pend=null; clPublish(); renderClient(); toast('응답이 없어요. 다시 눌러 주세요'); } },8000); }
@@ -3776,7 +3799,7 @@ let _lastCl='';
 function renderClient(){ if(APP.role!=='client') return; const me=clMe(); if(me&&CL.g) APP.scr='ctrl'; else if(APP.scr==='ctrl') APP.scr='join';
   const h=APP.scr==='ctrl'?ctrlHTML():joinHTML(); if(h===_lastCl) return; const sc=$('#scr'); if(!sc) return;
   const ae=document.activeElement; const typing=!!(ae&&ae.id==='jcode'); const val=typing?ae.value:null;
-  _lastCl=h; sc.innerHTML=h; if(typing){ const n=$('#jcode'); if(n){ n.value=val; n.focus(); } } }
+  _lastCl=h; sc.innerHTML=h; if(APP.scr==='ctrl') mmMount('cl'); if(typing){ const n=$('#jcode'); if(n){ n.value=val; n.focus(); } } }
 function miniBoard(g,me){ const ps=g.players.slice().sort((a,b)=>(b.al-a.al)||(G.prog(b)-G.prog(a)));
   return `<div class="mini">${ps.map(p=>`<div class="mini-r ${me&&p.id===me.id?'me':''}" style="--pc:${pcol(p.id)}"><i class="dot"></i><span>${esc(p.name)}</span><div class="hp ${hpCls(p)}"><i style="width:${p.al?Math.max(0,p.hp/p.mhp*100):0}%"></i></div><small>${p.al?'Lv'+p.lv:'탈락'}</small></div>`).join('')}</div>`; }
 function joinHTML(){ const mode=netMode(); const h=CL.hp; let body='';
@@ -3801,7 +3824,7 @@ function othersHTML(g,me){ const ps=g.players.filter(p=>p.id!==me.id).sort((a,b)
 function ctrlHTML(){ const g=CL.g, hp=CL.hp||{}; const me=clMe(); const c=CHARS[me.cid]; const busy=!!hp.busy, pend=!!CL.pend; let m='';
   if(g.st==='end') return `<div class="scr ctrl">${winSceneHTML(g.players,g.win,g.round,[])}</div>`;
   else if(!me.al){ const left=Math.max(0,20-Math.floor((Date.now()-(CL.deadAt||Date.now()))/1000));
-    if(left>0) return `<div class="scr ctrl gray" style="--pc:${pcol(me.id)}">${heroHTML(g,me)}<div class="ctrl-m"><div class="cm-big">😵</div><div class="cm-t">탈락했어요…</div><p class="cm-w"><b class="cnt">${left}</b>초 뒤에 다른 기사를 응원할 수 있어요</p></div><div class="ctrl-b">${othersHTML(g,me)}</div></div>`;
+    if(left>0) return pvWrap(g,me,`<div class="cm-big">😵</div><div class="cm-t">탈락했어요…</div><p class="cm-w"><b class="cnt">${left}</b>초 뒤에 응원할 수 있어요</p>`,' gray');
     m=`<div class="cm-t">📣 응원할 기사를 눌러 주세요!</div><p class="cm-w">누르면 메인 화면에서 그 기사가 반짝 빛나요</p><div class="cheer">${G.alive(g).map(p=>`<button class="ch-b" style="--pc:${pcol(p.id)}" data-act="clCheer" data-x="${p.id}" ${pend?'disabled':''}>${charSVG(p.cid,'full')}<b>${esc(p.name)}</b></button>`).join('')}</div>`; }
   else if(g.ph==='roll'){ const r=g.rolls[me.id];
     if(r&&r.st) m=`<div class="cm-big">🚫</div><p class="cm-w">이번 라운드는 움직일 수 없어요 (이동 불가 칸)</p>`;
@@ -3815,7 +3838,7 @@ function ctrlHTML(){ const g=CL.g, hp=CL.hp||{}; const me=clMe(); const c=CHARS[
         if(CL.ui==='atk'&&cA) m=`<div class="cm-t">⚔️ 누구를 공격할까요?</div><div class="tgts">${G.inRange(g,me).map(t=>tgtBtn(g,me,t,'clAttack')).join('')}</div><button class="btn ghost" data-act="clBack">← 돌아가기</button>`;
         else m=`<div class="cm-t">내 차례! 무엇을 할까요?</div>${G.canAlloc(g,me)?allocHTML(me,'clAlloc'):''}<div class="acts">${cA?`<button class="btn big candy" data-act="clAtkUi">⚔️ 일반 공격<small>${G.inRange(g,me).length}명 공격 가능</small></button>`:''}${cS?`<button class="btn big grape" data-act="clSkill">✨ ${esc(c.skill.nm)}<small>${esc(c.skill.ds)}</small></button>`:''}<button class="btn big ghost" data-act="clEnd">✅ 끝내기</button></div>`; } }
     else m=`<div class="cm-t">${cur?esc(cur.name)+' 님 차례':'진행 중…'}</div><p class="cm-w">메인 화면에서 진행 중이에요</p>`; }
-  return `<div class="scr ctrl" style="--pc:${pcol(me.id)}">${heroHTML(g,me)}<div class="ctrl-m scroll">${m}</div><div class="ctrl-b">${othersHTML(g,me)}</div></div>`; }
+  return pvWrap(g,me,m,''); }
 // 폰: 능력치 상승 · 기쁨/눈물 · 탈락 타이머 감지
 function clWatch(){ const g=CL.g, me=clMe(); if(!g||!me){ CL.pst=null; return; }
   if(!me.al&&!CL.deadAt){ CL.deadAt=Date.now(); clearInterval(CL.dT); CL.dT=setInterval(()=>{ _lastCl=''; renderClient(); if(Date.now()-CL.deadAt>21000) clearInterval(CL.dT); },1000); try{ navigator.vibrate&&navigator.vibrate(400); }catch(e){} }
@@ -3942,8 +3965,8 @@ function renderMe(){ const box=$('#me'); if(!box||APP.role!=='one'||!APP.S) retu
         else m=`<div class="cm-t">내 차례! 무엇을 할까요?</div>${G.canAlloc(S,p)?allocHTML(p,'alloc'):''}<div class="acts">${cA?`<button class="btn big candy" data-act="uiAtk">⚔️ 일반 공격<small>${G.inRange(S,p).length}명 공격 가능</small></button>`:''}${cS?`<button class="btn big grape" data-act="useSkill">✨ ${esc(c.skill.nm)}<small>${esc(c.skill.ds)}</small></button>`:''}<button class="btn big ghost" data-act="endStep">✅ 끝내기</button></div>`; } }
     else m=`<div class="cm-t">${cur?`🤖 ${esc(cur.name)} 차례`:'진행 중…'}</div><p class="cm-w">컴퓨터가 생각하는 중이에요…</p>`; }
   box.style.setProperty('--pc',pcol(me.id));
-  const html=`<div class="me-top"><span class="rnd">라운드 <b>${D.round}</b></span><span class="sp"></span><button class="btn sm mint" data-act="oneMap">🗺️ 전체화면 보기</button><button class="ib" data-act="menu" title="메뉴">☰</button></div>${heroHTML(D,me)}<div class="ctrl-m scroll">${m}</div><div class="ctrl-b">${othersHTML(D,me)}</div>`;
-  if(box._h!==html){ box._h=html; box.innerHTML=html; } }
+  const html=`<div class="me-top"><span class="rnd">라운드 <b>${D.round}</b></span><span class="sp"></span><button class="btn sm mint" data-act="oneMap">🗺️ 전체화면 보기</button><button class="ib" data-act="menu" title="메뉴">☰</button></div>${pvInner(D,me,m)}`;
+  if(box._h!==html){ box._h=html; box.innerHTML=html; } mmMount('one'); }
 function updMine(p,el){ const on=APP.role==='one'&&p.own==='host'; el.classList.toggle('mine',on); let t=el.querySelector('.pc-me');
   if(on&&!t){ t=document.createElementNS('http://www.w3.org/2000/svg','text'); t.setAttribute('class','pc-me'); t.setAttribute('x','0'); t.setAttribute('y','-100'); t.setAttribute('text-anchor','middle'); t.textContent='⭐ 나'; el.appendChild(t); }
   else if(!on&&t) t.remove(); }
@@ -4000,9 +4023,43 @@ Object.assign(ACT,{
   oneQuick(){ ONE.sub='quick'; APP.role='one'; APP.S=null; APP.roster=[]; APP.code=null; go('lobby'); },
   oneDream(){ ONE.sub='dream'; APP.role='one'; APP.S=null; APP.roster=[]; APP.code=null; go('lobby'); },
   oneMap(){ const b=$('#me'); if(b) b.classList.add('hidden'); const k=$('#meBtn'); if(k) k.classList.remove('hidden'); requestAnimationFrame(()=>{ CAM.apply(); const p=meP(APP.S); if(p&&p.al) CAM.follow(p.id,true); }); },
-  oneMe(){ const b=$('#me'); if(b) b.classList.remove('hidden'); const k=$('#meBtn'); if(k) k.classList.add('hidden'); renderMe(); },
+  oneMe(){ const b=$('#me'); if(b) b.classList.remove('hidden'); const k=$('#meBtn'); if(k) k.classList.add('hidden'); renderMe(); mmMount('one'); },
   snapWin(){ snapWin(); }, shareWin(){ shareWin(); },
 });
+// ===================== 개인 화면: 라이브 미니맵 + 3분할 배치 =====================
+const MM={el:null,svg:null,g:null,pc:{},an:{},raf:0,mode:'',cx:null,cy:null,last:0,key:''};
+function oppHTML(g,me){ const ps=g.players.filter(p=>p.id!==me.id);
+  return `<div class="opp">${ps.map(p=>`<div class="opp-i ${p.al?'':'dead'}" style="--pc:${pcol(p.id)}"><span class="av">${charSVG(p.cid,'head')}</span><b>${p.al?fmt(p.hp):'탈락'}</b></div>`).join('')}</div>`; }
+function pvInner(g,me,m){ const turn=/data-act="(clPick|clAttack|clAlloc|clAtkUi|clSkill|clCheer|pick|attack|alloc|uiAtk|useSkill)"/.test(m);
+  return `${heroHTML(g,me)}<div class="pv${turn?' turn':''}"><div class="pv-map" data-mm></div><div class="pv-act">${m}</div></div>${oppHTML(g,me)}`; }
+function pvWrap(g,me,m,cls){ return `<div class="scr ctrl${cls||''}" style="--pc:${pcol(me.id)}">${pvInner(g,me,m)}</div>`; }
+function mmEnsure(){ if(MM.el) return MM.el; const d=document.createElement('div'); d.className='mm';
+  const base=mapSVG().replace('<g id="pieces"></g><g id="fxmap"></g>','');
+  d.innerHTML=`<svg class="mm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice">${base}<g class="mm-pcs"></g></svg><div class="mm-tag">📍 내 위치 · 라이브</div>`;
+  MM.el=d; MM.svg=d.querySelector('svg'); MM.g=d.querySelector('.mm-pcs'); return d; }
+function mmSrc(){ if(MM.mode==='one'&&APP.S) return {D:ANIM.D||APP.S, me:meP(APP.S)}; if(MM.mode==='cl'&&CL.g) return {D:CL.g, me:clMe()}; return null; }
+function mmMount(mode){ const ph=document.querySelector('[data-mm]'); if(!ph) return; const el=mmEnsure(); if(el.parentNode!==ph) ph.appendChild(el); MM.mode=mode; mmSync(); if(!MM.raf){ MM.last=performance.now(); MM.raf=requestAnimationFrame(mmLoop); } }
+function mmSync(){ const s=mmSrc(); if(!s||!s.me||!MM.g) return; const D=s.D; const key=D.players.map(p=>p.cid).join(',');
+  if(key!==MM.key){ MM.key=key; MM.g.innerHTML=''; MM.pc={}; MM.an={}; MM.cx=null; }
+  for(const p of D.players){ let el=MM.pc[p.id];
+    if(!el){ MM.g.insertAdjacentHTML('beforeend',pieceSVG(p).replace(`id="pc${p.id}"`,`data-mp="${p.id}"`)); el=MM.g.lastElementChild; MM.pc[p.id]=el;
+      if(p.id===s.me.id){ el.classList.add('mine'); const t=document.createElementNS('http://www.w3.org/2000/svg','text'); t.setAttribute('class','pc-me'); t.setAttribute('y','-100'); t.setAttribute('text-anchor','middle'); t.textContent='⭐ 나'; el.appendChild(t); } }
+    el.style.display=p.al?'':'none'; const r=Math.max(0,p.hp/p.mhp); const f=el.querySelector('.pc-hpf'); if(f){ f.setAttribute('width',(30.8*r).toFixed(1)); f.setAttribute('fill',r<=.25?'#FF5D73':r<=.5?'#FFC93C':'#3CCFB4'); }
+    if(!MM.an[p.id]) MM.an[p.id]={t:p.pos,from:p.pos,to:p.pos,u:1}; }
+  if(MM.g.lastElementChild!==MM.pc[s.me.id]&&MM.pc[s.me.id]) MM.g.appendChild(MM.pc[s.me.id]); }
+function mmLoop(ts){ if(!MM.el||!MM.el.isConnected){ MM.raf=0; return; } const dt=Math.min(80,ts-MM.last); MM.last=ts; const s=mmSrc();
+  if(s&&s.me){ const D=s.D; let mx=null, my=null;
+    for(const p of D.players){ const el=MM.pc[p.id]; if(!el) continue; let x, y;
+      if(MM.mode==='one'){ const m=document.getElementById('pc'+p.id); const tr=m&&m.getAttribute('transform'); const k=tr&&tr.match(/translate\(([-\d.]+),([-\d.]+)\)/); if(k){ x=+k[1]; y=+k[2]; } else { const q=pcPos(D,p); x=q.x; y=q.y; } }
+      else { const a=MM.an[p.id]; const tgt=p.pos;
+        if(a.u>=1&&a.t!==tgt){ const f=(tgt-a.t+BOARD_N)%BOARD_N; const b=BOARD_N-f; if(Math.min(f,b)>25){ a.t=tgt; } else { const dir=f<=b?1:-1; a.from=a.t; a.to=(a.t+dir+BOARD_N)%BOARD_N; a.u=0; } }
+        if(a.u<1){ a.u=Math.min(1,a.u+dt/150); const A=TILES[a.from], B=TILES[a.to]; x=A.x+(B.x-A.x)*a.u; y=A.y+(B.y-A.y)*a.u-Math.sin(Math.PI*a.u)*16; if(a.u>=1) a.t=a.to; }
+        else { const q=pcPos(D,p); x=q.x; y=q.y; } }
+      el.setAttribute('transform',`translate(${x.toFixed(1)},${y.toFixed(1)})`); if(p.id===s.me.id){ mx=x; my=y; } }
+    if(mx!=null){ const W=MM.el.clientWidth||200, H=MM.el.clientHeight||200; const vw=Math.max(240,Math.min(300,W*1.6)), vh=vw*H/W; const tx=mx, ty=my-34;
+      if(MM.cx==null){ MM.cx=tx; MM.cy=ty; } MM.cx+=(tx-MM.cx)*0.14; MM.cy+=(ty-MM.cy)*0.14;
+      MM.svg.setAttribute('viewBox',`${(MM.cx-vw/2).toFixed(1)} ${(MM.cy-vh/2).toFixed(1)} ${vw} ${vh.toFixed(1)}`); } }
+  MM.raf=requestAnimationFrame(mmLoop); }
 // ===================== ANIM : 메인 화면 연출 · 카메라 · 소리 =====================
 const ANIM={q:[], busy:false, D:null, cap:''};
 const spd=()=>APP.tspd||APP.speed||1;
