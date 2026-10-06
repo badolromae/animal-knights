@@ -3704,7 +3704,7 @@ function titleHTML(){ const sv=store.get('ank2-save',null); const can=!!(sv&&sv.
   <button class="btn candy wide" data-act="goJoin">🙋 폰으로 참가하기</button>
   ${can?`<button class="btn grape wide" data-act="resume">▶ 이어하기 (라운드 ${sv.S.round})</button>`:''}
   <div class="row2"><button class="btn ghost" data-act="rules">📖 게임 방법</button><button class="btn ghost" data-act="dex">🐾 캐릭터 도감</button></div></div>
-  <div class="foot">${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
+  <div class="foot">🏷️ 버전 10.06 · 회피/막기 직접 선택<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
 function updTitleBan(){ const b=$('#tban'); if(!b) return; const hs=NET.hosts||[];
   b.innerHTML=hs.length?`<div class="hostban">🎮 방 <b>${esc(hs[0])}</b>에서 플레이어를 모으고 있어요!<br><button class="btn sm sun" data-act="jRoom" data-c="${esc(hs[0])}" style="margin-top:6px">🙋 이 방에 참가하기</button></div>`:''; }
 
