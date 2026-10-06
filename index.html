@@ -387,6 +387,12 @@ input{font:inherit;color:var(--text);-webkit-user-select:text;user-select:text}
 .mm-tag{top:auto;bottom:6px}
 .mm-tile{position:absolute;left:6px;right:6px;top:6px;z-index:2;text-align:center;font-size:13.5px;font-weight:800;line-height:1.25;color:var(--ink);background:#FFF6DE;border:3px solid var(--line);border-radius:12px;padding:4px 6px;box-shadow:0 3px 0 rgba(74,52,40,.3);animation:popin .35s cubic-bezier(.3,1.6,.5,1)}
 .mm-tile.ev{background:#FFE15A}
+.guard{width:100%;background:#FFF0F0;border:3px solid #FF5D73;border-radius:18px;padding:8px 10px;animation:gdin .4s cubic-bezier(.3,1.6,.5,1)}
+@keyframes gdin{from{transform:scale(.7);opacity:0}}
+.gd-t{font-size:16px;font-weight:800;color:#D9304A;margin-bottom:6px}
+.gd-i{display:flex;gap:8px;align-items:center;text-align:left;font-size:13.5px;margin-bottom:6px}.gd-i .av{width:42px;height:42px;flex:none;border-radius:50%;border:3px solid var(--line);overflow:hidden;background:#fff}.gd-i .av svg{width:100%;height:100%}
+.gd-d{font-size:20px;color:#E8442E}
+.guard .acts{display:flex;flex-direction:column;gap:6px}
 </style>
 </head>
 <body>
@@ -2800,7 +2806,7 @@ const REGIONS=[
 function regionOf(i){ for(let r=0;r<REGIONS.length;r++){ const R_=REGIONS[r]; if(R_.from<=R_.to){ if(i>=R_.from&&i<=R_.to) return r; } else if(i>=R_.from||i<=R_.to) return r; } return 0; }
 
 // 균형 혜택 (시뮬레이션으로 맞춘 값): [시작 체력 배수, 레벨업 추가 보너스]
-const BEN={"1": [1.16, 0, 1.0], "2": [1.13, 0, 1.0], "3": [1.0, 0, 0.85], "4": [1.0, 0, 0.55], "5": [1.0, 0, 0.98], "6": [1.0, 0, 0.33], "7": [1.05, 0, 1.0], "8": [1.09, 0, 1.0], "9": [1.0, 0, 0.88], "10": [1.0, 0, 0.68], "11": [1.0, 0, 0.98], "12": [1.07, 0, 1.0], "13": [1.2, 0, 1.0], "14": [1.41, 0, 1.0], "15": [1.0, 0, 0.95], "16": [1.0, 0, 0.96], "17": [1.0, 0, 0.8], "18": [1.0, 0, 1.0], "19": [1.1, 0, 1.0], "20": [1.04, 0, 1.0]};
+const BEN={"1": [1.14, 0, 1.0], "2": [1.125, 0, 1.0], "3": [1.0, 0, 0.77], "4": [1.0, 0, 0.72], "5": [1.0, 0, 0.81], "6": [1.0, 0, 0.23], "7": [1.012, 0, 1.0], "8": [1.03, 0, 1.0], "9": [1.0, 0, 0.87], "10": [1.0, 0, 0.66], "11": [1.0, 0, 0.82], "12": [1.016, 0, 1.0], "13": [1.01, 0, 1.0], "14": [1.3, 0, 1.0], "15": [1.0, 0, 0.9], "16": [1.0, 0, 0.98], "17": [1.0, 0, 0.66], "18": [1.008, 0, 1.0], "19": [1.05, 0, 1.0], "20": [1.01, 0, 1.0]};
 for(const k in BEN){ const c=CHARS[k], b=BEN[k]; c.atk0=c.atk0||c.atk; c.def0=c.def0||c.def; c.hb=b[0]; c.xb=b[1]; const sc=b[2]||1; c.atk=Math.max(1,Math.round(c.atk0*sc)); c.def=Math.max(1,Math.round(c.def0*sc)); }
 
 Object.assign(TILE_INFO,{
@@ -3242,6 +3248,8 @@ const G = {
     if(c.skill.t==='shark6') return G.canPre(s,p);
     return G.isCur(s,p)&&s.sub==='act'&&!s.fl.sk; },
   canAttack(s,p){ return s.st==='play'&&G.isCur(s,p)&&s.sub==='act'&&!s.fl.att&&G.inRange(s,p).length>0; },
+  canCombo(s,p){ return s.st==='play'&&G.isCur(s,p)&&s.sub==='act'&&!!(s.fl&&s.fl.cb)&&!!CHARS[p.cid].combo; },
+  canPassive(s,p){ return s.st==='play'&&G.isCur(s,p)&&s.sub==='act'&&(p.pv||0)>0&&G.opps(s,p).length>0; },
   canAlloc(s,p){ return s.st==='play'&&G.isCur(s,p)&&s.sub==='act'&&(p.bp||0)>0; },
   sd(s){ return s.set.sd>0&&s.round>=s.set.sd; },
   sdMul(s){ return G.sd(s)? 1+RULES.sdStep*(s.round-s.set.sd+1) : 1; },
@@ -3286,16 +3294,25 @@ function gameAct(s, a){
       const pd=s.pd; s.pd=null; s.sub=null;
       if(pd.k==='tile'){ tileHit(s,P,tg,pd.mode,ev); if(s.st==='play'){ if(!P.al) nextStep(s,ev); else { s.sub='act'; autoStep(s,ev); } } break; }
       strike(s,P,[tg],pd.raw,'combo',pd.lb,pd.m,ev);
-      if(s.st==='play'){ const r=runFx(s,P,ev,pd.ret); if(r==='done') afterFx(s,P,ev); else if(r==='wait') s.sub='choose'; }
+      if(s.st==='play'){ const r=runFx(s,P,ev,pd.ret); comboAfter(s,P,ev,r); }
       break; }
     case 'alloc': {
       if(!P||!G.canAlloc(s,P)) return bad();
       const A=Math.max(0,Math.floor(+a.a||0)), D=Math.max(0,Math.floor(+a.d||0)), X=a.x?1:0; const cost=A+D+X*RULES.diceCost;
       if(cost<=0||cost>P.bp) return bad('보너스 점수가 모자라요');
       P.ab+=A; P.db+=D; P.dx+=X; P.bp-=cost; ev.push({e:'alloc',p:P.id,a:A,d:D,x:X,bp:P.bp}); autoStep(s,ev); break; }
+    case 'combo': { if(!P||!G.canCombo(s,P)) return bad(); doCombo(s,P,ev); break; }
+    case 'passive': { if(!P||!G.canPassive(s,P)) return bad(); P.pv--; passive(s,P,ev); if(s.st==='play'){ if(!P.al) nextStep(s,ev); else autoStep(s,ev); } break; }
+    case 'guard': { if(s.sub!=='guard'||!s.gq||!s.gq.length) return bad(); const g=s.gq[0]; if(!P||P.id!==g.t) return bad(); s.gq.shift(); resolveGuard(s,g,!!a.u,ev);
+      while(s.st==='play'&&s.gq.length){ const n0=s.gq[0], T0=s.players[n0.t]; if(T0&&T0.al&&T0.tk>0) break; s.gq.shift(); resolveGuard(s,n0,false,ev); }
+      if(s.st!=='play') break;
+      if(!s.gq.length){ const gs=s.gs||{sub:'act',next:0}; s.gs=null; s.sub=gs.sub; const cur=G.cur(s);
+        if(gs.next||!cur||!cur.al) nextStep(s,ev); else if(s.sub==='act') autoStep(s,ev); }
+      break; }
     case 'end': { if(!P||!G.isCur(s,P)||s.sub!=='act') return bad(); nextStep(s,ev); break; }
     default: return bad();
   }
+  if(s.st==='play'&&s.gq&&s.gq.length&&s.sub!=='guard'){ s.gs={sub:s.sub||'act',next:0}; s.sub='guard'; }
   s.seq++;
   return {ok:true, ev};
 }
@@ -3328,24 +3345,21 @@ function startRes(s,ev){
 }
 
 function nextStep(s,ev){
-  s.sub=null; s.pd=null; s.fl={att:0,sk:0};
+  if(s.gq&&s.gq.length){ s.gs={sub:'act',next:1}; s.sub='guard'; return; }
+  s.sub=null; s.pd=null; s.fl={att:0,sk:0,cb:0,cmv:0};
   while(s.st==='play'){
     s.ci++;
     if(s.ci>=s.order.length){ endRound(s,ev); return; }
     const p=s.players[s.order[s.ci]]; if(!p.al) continue;
     ev.push({e:'step', p:p.id, i:s.ci});
-    while(p.pv>0&&s.st==='play'){ p.pv--; passive(s,p,ev); }
-    if(s.st!=='play') return;
-    const r=s.rolls[p.id];
-    if(r&&r.c){ ev.push({e:'combo',p:p.id,nm:CHARS[p.cid].combo.nm});
-      const res=runFx(s,p,ev,0); if(s.st!=='play') return; if(res==='wait'){ s.sub='choose'; return; } }
+    const r=s.rolls[p.id]; s.fl.cb=(r&&r.c&&!r.st)?1:0;
     afterFx(s,p,ev); return;
   }
 }
 
 function afterFx(s,p,ev){ const r0=s.rolls[p.id]; const r=(r0&&r0.st)?null:landOn(s,p,ev,0); if(s.st!=='play') return; if(!p.al){ nextStep(s,ev); return; } if(r==='wait'){ s.sub='choose'; return; } s.sub='act'; autoStep(s,ev); }
-function autoStep(s,ev){ if(s.st!=='play'||s.ph!=='res'||s.sub!=='act') return; const p=G.cur(s); if(!p) return;
-  if(G.canAttack(s,p)||G.canSkill(s,p)||(p.bp||0)>0) return; nextStep(s,ev); }
+function autoStep(s,ev){ if(s.st!=='play'||s.ph!=='res'||s.sub!=='act') return; if(s.gq&&s.gq.length){ s.gs={sub:'act',next:0}; s.sub='guard'; return; } const p=G.cur(s); if(!p) return;
+  if(G.canAttack(s,p)||G.canSkill(s,p)||G.canCombo(s,p)||G.canPassive(s,p)||(p.bp||0)>0) return; nextStep(s,ev); }
 
 function endRound(s,ev){
   s.round++; s.ph='roll'; s.rolls={}; s.order=[]; s.ci=-1; s.sub=null; s.pd=null; s.fl={att:0,sk:0};
@@ -3389,7 +3403,7 @@ function lapDone(s,p,ev,queued){
   if(c.skill&&up){ if(c.skill.t==='shark6'){ p.skl++; if(p.skl>=2){ p.sk=Math.min(9,p.sk+1); p.skl=0; } } else p.sk=Math.min(9,p.sk+1); }
   if(c.token){ p.tk=Math.min(c.token.mx, p.tk+c.token.inc); }
   ev.push({e:'lap',p:p.id,lv:p.lv,up,h,g,bp:p.bp,sk:p.sk,skl:p.skl,tk:p.tk,mhp:p.mhp,lap:p.lap});
-  if(c.passive&&c.passive.t==='lapAll'){ if(queued) p.pv++; else passive(s,p,ev); }
+  if(c.passive&&c.passive.t==='lapAll') p.pv++;
 }
 function passive(s,p,ev){ const c=CHARS[p.cid]; const o=G.opps(s,p);
   if(o.length) strike(s,p,o,G.atk(p)*c.passive.m,'passive',c.passive.nm,'×'+c.passive.m,ev); }
@@ -3444,14 +3458,20 @@ function treasure(s,p,ev,depth){
 function strike(s,att,tgts,raw,kind,lb,m,ev,o){
   o=o||{}; const res=[]; const mul=G.sdMul(s);
   for(const t of tgts){ if(!t.al) continue; const tc=CHARS[t.cid];
-    if(!o.nodef&&tc.token&&t.tk>0){ t.tk--; res.push({p:t.id,d:0,r:tc.token.k==='block'?'B':'E',h:t.hp,x:0}); continue; }
+    if(!o.nodef&&tc.token&&t.tk>0){ (s.gq=s.gq||[]).push({a:att.id,t:t.id,d:G.dmg(raw*mul,t),k:kind,lb,m,raw:Math.round(raw),sd:mul}); continue; }
     let dmg=o.nodef?Math.max(1,Math.round(raw*mul)):G.dmg(raw*mul,t); if(o.keep1) dmg=Math.max(0,Math.min(dmg,t.hp-1));
     t.hp=Math.max(0,t.hp-dmg); const x=t.hp<=0?1:0; if(x){ t.al=0; s.out.push(t.id); }
     res.push({p:t.id,d:dmg,r:'H',h:t.hp,x});
   }
-  ev.push({e:'atk',p:att.id,k:kind,lb,m,raw:Math.round(raw),sd:mul,t:res});
+  if(res.length) ev.push({e:'atk',p:att.id,k:kind,lb,m,raw:Math.round(raw),sd:mul,t:res});
   checkWin(s,ev);
 }
+function resolveGuard(s,g,use,ev){ const T=s.players[g.t], A=s.players[g.a]; if(!T||!T.al) return; const tc=CHARS[T.cid];
+  if(use&&T.tk>0){ T.tk--; ev.push({e:'atk',p:A.id,k:g.k,lb:g.lb,m:g.m,raw:g.raw,sd:g.sd,t:[{p:T.id,d:0,r:tc.token.k==='block'?'B':'E',h:T.hp,x:0}]}); return; }
+  T.hp=Math.max(0,T.hp-g.d); const x=T.hp<=0?1:0; if(x){ T.al=0; s.out.push(T.id); }
+  ev.push({e:'atk',p:A.id,k:g.k,lb:g.lb,m:g.m,raw:g.raw,sd:g.sd,t:[{p:T.id,d:g.d,r:'H',h:T.hp,x}]}); checkWin(s,ev); }
+function doCombo(s,p,ev){ const c=CHARS[p.cid].combo; s.fl.cb=0; s.fl.cmv=c.fx.some(f=>f[0]==='move'||f[0]==='step')?1:0; ev.push({e:'combo',p:p.id,nm:c.nm}); const r=runFx(s,p,ev,0); if(s.st!=='play') return; comboAfter(s,p,ev,r); }
+function comboAfter(s,p,ev,r){ if(r==='wait'){ s.sub='choose'; return; } if(!p.al){ nextStep(s,ev); return; } if(s.fl.cmv){ s.fl.cmv=0; afterFx(s,p,ev); } else { s.sub='act'; autoStep(s,ev); } }
 
 function checkWin(s,ev){
   const al=G.alive(s);
@@ -3539,11 +3559,11 @@ function peerClientTransport(code){ const P=PeerC(); let mine={}, cb=null, hostP
   peer.on('disconnected',()=>retry(1500));
   return t; }
 
-function packState(s){ return {q:s.seq, r:s.round, st:s.st, ph:s.ph, ci:s.ci, sub:s.sub||0, o:s.order, w:s.win, fl:[s.fl.att,s.fl.sk], set:[s.set.hp,s.set.range,s.set.sd],
+function packState(s){ return {q:s.seq, r:s.round, st:s.st, ph:s.ph, ci:s.ci, sub:s.sub||0, o:s.order, w:s.win, fl:[s.fl.att,s.fl.sk,s.fl.cb||0], gq:(s.sub==='guard'&&s.gq&&s.gq[0])?[s.gq[0].a,s.gq[0].t,s.gq[0].d,s.gq[0].lb]:0, set:[s.set.hp,s.set.range,s.set.sd],
   R:Object.keys(s.rolls).map(k=>{ const r=s.rolls[k]; return [+k,r.d,r.f,r.b,r.c,r.fs,r.st?1:0]; }),
   P:s.players.map(p=>[p.name,p.cid,p.own,p.pos,p.lap,p.lv,p.hp,p.mhp,p.sk,p.skl,p.tk,p.al,p.pv,p.bp,p.ab,p.db,p.dx,p.stun||0,p.emo||0]), pk:s.pd?s.pd.k+':'+(s.pd.mode||''):'' }; }
 function unpackState(g){ if(!g||!Array.isArray(g.P)||!Array.isArray(g.set)) return null; const rolls={}; (g.R||[]).forEach(r=>{ rolls[r[0]]={d:r[1]||[],f:r[2],b:r[3],c:r[4],fs:Array.isArray(r[5])?r[5]:null,st:r[6]?1:0}; });
-  return {v:2, seq:g.q, round:g.r, st:g.st, ph:g.ph, ci:g.ci, sub:g.sub||null, order:g.o||[], win:g.w, pd:g.pk?{k:String(g.pk).split(':')[0],mode:String(g.pk).split(':')[1]||''}:null, fl:{att:(g.fl||[])[0]||0, sk:(g.fl||[])[1]||0},
+  return {v:2, seq:g.q, round:g.r, st:g.st, ph:g.ph, ci:g.ci, sub:g.sub||null, order:g.o||[], win:g.w, pd:g.pk?{k:String(g.pk).split(':')[0],mode:String(g.pk).split(':')[1]||''}:null, fl:{att:(g.fl||[])[0]||0, sk:(g.fl||[])[1]||0, cb:(g.fl||[])[2]||0}, gq:Array.isArray(g.gq)?[{a:g.gq[0],t:g.gq[1],d:+g.gq[2]||0,lb:String(g.gq[3]||'')}]:[],
     set:{hp:g.set[0],range:g.set[1],sd:g.set[2]}, rolls, out:[],
     players:g.P.map((a,i)=>({id:i,name:String(a[0]),cid:+a[1]||1,own:a[2],pos:a[3]|0,lap:a[4]|0,lv:a[5]|0,hp:a[6]|0,mhp:a[7]||1,sk:a[8]|0,skl:a[9]|0,tk:a[10]|0,al:a[11]|0,pv:a[12]|0,bp:a[13]|0,ab:a[14]|0,db:a[15]|0,dx:a[16]|0,stun:a[17]|0,emo:a[18]|0})) }; }
 
@@ -3591,8 +3611,8 @@ function hostRemoteAct(dev,a){ const S=APP.S; if(!S||!a||typeof a!=='object') re
   if(a.t==='cheer'){ if(p.al) return; const now=Date.now(); HOST.cht=HOST.cht||{}; if(now-(HOST.cht[dev]||0)<600) return; HOST.cht[dev]=now; const T=S.players[+a.x]; if(T&&T.al&&APP.scr==='game') cheerFx(p.id,T.id); return; }
   let act=null; const t=a.t;
   if(t==='roll'){ if(a.r!==S.round) return; act={t:'roll',p:p.id,sk:a.sk?1:0}; }
-  else if(['attack','pick','skill','end','alloc'].includes(t)){ if(a.q!==S.seq||ANIM.busy) return; act={t,p:p.id};
-    if(t==='attack'||t==='pick') act.x=+a.x; if(t==='alloc'){ act.a=+a.a||0; act.d=+a.d||0; act.x=a.x?1:0; } }
+  else if(['attack','pick','skill','end','alloc','guard','combo','passive'].includes(t)){ if(a.q!==S.seq||ANIM.busy) return; act={t,p:p.id};
+    if(t==='attack'||t==='pick') act.x=+a.x; if(t==='alloc'){ act.a=+a.a||0; act.d=+a.d||0; act.x=a.x?1:0; } if(t==='guard') act.u=a.u?1:0; }
   if(!act) return; const r=gameAct(S,act); if(r.ok) afterAct(r.ev); }
 function hostLobbySweep(){ if(APP.role!=='host'||APP.S||!HOST.t) return; const now=Date.now(); let ch=false;
   for(let i=APP.roster.length-1;i>=0;i--){ const r=APP.roster[i]; if(r.own!=='host'&&!HOST.on.has(r.own)&&HOST.gone[r.own]&&now-HOST.gone[r.own]>8000){ APP.roster.splice(i,1); ch=true; } }
@@ -3779,7 +3799,20 @@ function allocHTML(p,act){ const b=p.bp, cost=RULES.diceCost; const rc=recAlloc(
   ${b>=2?`<button class="btn sm ghost" data-act="${act}" data-k="half">⚔️+${Math.ceil(b/2)} 🛡️+${Math.floor(b/2)}</button>`:''}<button class="btn sm sun${R('dice')}" data-act="${act}" data-k="dice" ${b<cost?'disabled':''}>${B('dice')}🎲 주사위 눈 +1 (${cost}점)</button></div></div>`; }
 function allocAct(p,k){ const b=p.bp; if(k==='atk') return {t:'alloc',p:p.id,a:b,d:0,x:0}; if(k==='def') return {t:'alloc',p:p.id,a:0,d:b,x:0};
   if(k==='half') return {t:'alloc',p:p.id,a:Math.ceil(b/2),d:Math.floor(b/2),x:0}; return {t:'alloc',p:p.id,a:0,d:0,x:1}; }
-function dockRes(S){ const p=G.cur(S); if(!p) return '<div class="dk-cap">…</div>'; const c=CHARS[p.cid]; const ty=TT[p.pos];
+function guardRec(T,g){ return g.d>=T.hp||g.d>=T.mhp*0.06; }
+function guardHTML(S,T,g,act,dis){ const A=S.players[g.a]; const tc=CHARS[T.cid]; const blk=tc.token&&tc.token.k==='block'; const nm=blk?'막기':'회피'; const ic=blk?'🛡️':'💨'; const left=Math.max(0,T.hp-g.d); const rec=guardRec(T,g);
+  return `<div class="guard"><div class="gd-t">⚠️ ${esc(T.name)}에게 공격이 들어와요!</div><div class="gd-i"><span class="av">${A?charSVG(A.cid,'head'):''}</span><div>${A?esc(A.name):''}의 <b>${esc(g.lb||'공격')}</b><br>받을 피해 <b class="gd-d">-${fmt(g.d)}</b><br><small>체력 ${fmt(T.hp)} → ${fmt(left)}${left<=0?' 😵 탈락!':''}</small></div></div>
+  <div class="al-rec">👍 추천: ${rec?nm+'하기! (피해가 커요)':'그냥 맞기 ('+nm+'는 큰 공격에 아껴 둬요)'}</div>
+  <div class="acts"><button class="btn big sky${rec?' rec':''}" data-act="${act}" data-u="1" ${dis||T.tk<1?'disabled':''}>${ic} ${nm}하기<small>남은 ${nm} ${T.tk}번</small></button><button class="btn big ghost${rec?'':' rec'}" data-act="${act}" data-u="0" ${dis?'disabled':''}>💪 그냥 맞기<small>${nm}는 아껴 둬요</small></button></div></div>`; }
+function dockGuard(S){ const g0=S.gq[0]; const T=S.players[g0.t];
+  if(T.own==='ai') return `<div class="dk-wait">🤖 ${esc(T.name)}이(가) 공격을 받을지 고민 중…</div>`;
+  if(!isLocalP(T)) return `<div class="dk-wait">📱 ${esc(T.name)} 님이 폰에서 회피·막기를 고르는 중…</div><div class="row2"><button class="btn sm ghost" data-act="skipRemote">⏩ 대신 결정</button></div>`;
+  return guardHTML(S,T,g0,'guard',false); }
+function specialBtns(S,p,pre){ const c=CHARS[p.cid]; let h='';
+  if(G.canCombo(S,p)) h+=`<button class="btn big sun" data-act="${pre?'clCombo':'useCombo'}">💥 콤보 · ${esc(c.combo.nm)}<small>${esc(c.combo.ds)}</small></button>`;
+  if(G.canPassive(S,p)) h+=`<button class="btn big candy" data-act="${pre?'clPassive':'usePassive'}">⚡ ${esc(c.passive.nm)} (${p.pv}회)<small>${esc(c.passive.ds)}</small></button>`;
+  return h; }
+function dockRes(S){ if(S.sub==='guard'&&S.gq&&S.gq[0]) return dockGuard(S); const p=G.cur(S); if(!p) return '<div class="dk-cap">…</div>'; const c=CHARS[p.cid]; const ty=TT[p.pos];
   let h=`<div class="dk-who" style="--pc:${pcol(p.id)}"><div class="av">${charSVG(p.cid,'head')}</div><div><b>${esc(p.name)}</b> 차례<small>${S.ci+1}/${S.order.length}번째 · ${p.pos}번 칸${ty!=='plain'&&TILE_INFO[ty]?' ('+TILE_INFO[ty].nm+')':''}</small></div></div>`;
   if(p.own==='ai') return h+`<div class="dk-wait">🤖 ${esc(p.name)} 생각 중…</div>`;
   if(!isLocalP(p)) return h+`<div class="dk-wait">📱 ${esc(p.name)} 님이 폰에서 고르는 중…</div><div class="row2"><button class="btn sm ghost" data-act="skipRemote">⏩ 대신 넘기기</button></div>`;
@@ -3787,7 +3820,7 @@ function dockRes(S){ const p=G.cur(S); if(!p) return '<div class="dk-cap">…</d
   const cA=G.canAttack(S,p), cS=G.canSkill(S,p);
   if(APP.ui==='atk'&&cA) return h+`<div class="dk-q">⚔️ 누구를 공격할까요? ${ty==='duel'?'<small>(결투장: 거리 상관없음)</small>':''}</div><div class="tgts">${G.inRange(S,p).map(t=>tgtBtn(S,p,t,'attack')).join('')}</div><button class="btn sm ghost" data-act="uiBack">← 돌아가기</button>`;
   if(G.canAlloc(S,p)) h+=allocHTML(p,'alloc');
-  h+='<div class="acts">';
+  h+='<div class="acts">'+specialBtns(S,p,'');
   if(cA) h+=`<button class="btn big candy" data-act="uiAtk">⚔️ 일반 공격<small>${G.inRange(S,p).length}명 공격 가능 · 주사위 1개 × 공격력 ${G.atk(p)}</small></button>`;
   if(cS) h+=`<button class="btn big grape" data-act="useSkill">✨ ${esc(c.skill.nm)}<small>${esc(c.skill.ds)}</small></button>`;
   h+=`<button class="btn ghost" data-act="endStep">✅ ${p.bp>0?'보너스는 나중에 쓰고 ':''}끝내기</button></div>`;
@@ -3830,6 +3863,7 @@ function ctrlHTML(){ const g=CL.g, hp=CL.hp||{}; const me=clMe(); const c=CHARS[
   else if(!me.al){ const left=Math.max(0,20-Math.floor((Date.now()-(CL.deadAt||Date.now()))/1000));
     if(left>0) return pvWrap(g,me,`<div class="cm-big">😵</div><div class="cm-t">탈락했어요…</div><p class="cm-w"><b class="cnt">${left}</b>초 뒤에 응원할 수 있어요</p>`,' gray');
     m=`<div class="cm-t">📣 응원할 기사를 눌러 주세요!</div><p class="cm-w">누르면 메인 화면에서 그 기사가 반짝 빛나요</p><div class="cheer">${G.alive(g).map(p=>`<button class="ch-b" style="--pc:${pcol(p.id)}" data-act="clCheer" data-x="${p.id}" ${pend?'disabled':''}>${charSVG(p.cid,'full')}<b>${esc(p.name)}</b></button>`).join('')}</div>`; }
+  else if(g.sub==='guard'&&g.gq&&g.gq[0]&&g.gq[0].t===me.id) m=guardHTML(g,me,g.gq[0],'clGuard',busy||pend);
   else if(g.ph==='roll'){ const r=g.rolls[me.id];
     if(r&&r.st) m=`<div class="cm-big">🚫</div><p class="cm-w">이번 라운드는 움직일 수 없어요 (이동 불가 칸)</p>`;
     else if(r){ const hv=r.c?comboVals(c.combo,r.d):[]; m=`<div class="cm-t">내 주사위</div><div class="dice">${r.d.map((v,i)=>dieHTML(v,fOf(r,i),'big'+(hv.includes(v)?' hl':''))).join('')}</div><div class="cm-sum">${sumArr(r.d)}칸 이동${r.c?' · 💥 '+esc(c.combo.nm):''}${r.b?' · 🦈 광란':''}</div><p class="cm-w">다른 플레이어를 기다리는 중… (${Object.keys(g.rolls).length}/${g.players.filter(p=>p.al).length})</p>`; }
@@ -3840,7 +3874,7 @@ function ctrlHTML(){ const g=CL.g, hp=CL.hp||{}; const me=clMe(); const c=CHARS[
       else if(g.sub==='choose') m=`<div class="cm-t">${chooseTitle(g)}</div><div class="tgts">${G.opps(g,me).map(t=>tgtBtn(g,me,t,'clPick')).join('')}</div>`;
       else { const cA=G.canAttack(g,me), cS=G.canSkill(g,me);
         if(CL.ui==='atk'&&cA) m=`<div class="cm-t">⚔️ 누구를 공격할까요?</div><div class="tgts">${G.inRange(g,me).map(t=>tgtBtn(g,me,t,'clAttack')).join('')}</div><button class="btn ghost" data-act="clBack">← 돌아가기</button>`;
-        else m=`<div class="cm-t">내 차례! 무엇을 할까요?</div>${G.canAlloc(g,me)?allocHTML(me,'clAlloc'):''}<div class="acts">${cA?`<button class="btn big candy" data-act="clAtkUi">⚔️ 일반 공격<small>${G.inRange(g,me).length}명 공격 가능</small></button>`:''}${cS?`<button class="btn big grape" data-act="clSkill">✨ ${esc(c.skill.nm)}<small>${esc(c.skill.ds)}</small></button>`:''}<button class="btn big ghost" data-act="clEnd">✅ 끝내기</button></div>`; } }
+        else m=`<div class="cm-t">내 차례! 무엇을 할까요?</div>${G.canAlloc(g,me)?allocHTML(me,'clAlloc'):''}<div class="acts">${specialBtns(g,me,'cl')}${cA?`<button class="btn big candy" data-act="clAtkUi">⚔️ 일반 공격<small>${G.inRange(g,me).length}명 공격 가능</small></button>`:''}${cS?`<button class="btn big grape" data-act="clSkill">✨ ${esc(c.skill.nm)}<small>${esc(c.skill.ds)}</small></button>`:''}<button class="btn big ghost" data-act="clEnd">✅ 끝내기</button></div>`; } }
     else m=`<div class="cm-t">${cur?esc(cur.name)+' 님 차례':'진행 중…'}</div><p class="cm-w">메인 화면에서 진행 중이에요</p>`; }
   return pvWrap(g,me,m,''); }
 // 폰: 능력치 상승 · 기쁨/눈물 · 탈락 타이머 감지
@@ -3900,7 +3934,7 @@ const ACT={
   useSkill(){ const p=G.cur(APP.S); if(p) localAct({t:'skill',p:p.id}); },
   endStep(){ const p=G.cur(APP.S); if(p) localAct({t:'end',p:p.id}); },
   alloc(el){ const p=G.cur(APP.S); if(p) localAct(allocAct(p,el.dataset.k)); },
-  skipRemote(){ const S=APP.S; const p=G.cur(S); if(!p) return; if(S.sub==='choose'){ const o=G.opps(S,p).sort((a,b)=>a.hp-b.hp); if(o[0]) localAct({t:'pick',p:p.id,x:o[0].id}); } else localAct({t:'end',p:p.id}); },
+  skipRemote(){ { const S0=APP.S; if(S0&&S0.sub==='guard'&&S0.gq&&S0.gq[0]){ const g0=S0.gq[0]; localAct({t:'guard',p:g0.t,u:guardRec(S0.players[g0.t],g0)?1:0}); return; } } const S=APP.S; const p=G.cur(S); if(!p) return; if(S.sub==='choose'){ const o=G.opps(S,p).sort((a,b)=>a.hp-b.hp); if(o[0]) localAct({t:'pick',p:p.id,x:o[0].id}); } else localAct({t:'end',p:p.id}); },
   camAll(){ CAM.all(); },
   zoomIn(){ CAM.zoomAt(1.7); }, zoomOut(){ CAM.zoomAt(1/1.7); },
   toggleLog(){ const lp=$('#logp'); if(!lp) return; lp.classList.toggle('hidden'); if(!lp.classList.contains('hidden')) renderLog(); },
@@ -3922,6 +3956,10 @@ const ACT={
   clSkill(){ const me=clMe(); if(me) clAct({t:'skill',p:me.id,q:CL.g.seq}); },
   clEnd(){ const me=clMe(); if(me) clAct({t:'end',p:me.id,q:CL.g.seq}); },
   clCheer(el){ const me=clMe(); if(!me) return; el.classList.add('sent'); setTimeout(()=>el.classList.remove('sent'),900); clAct({t:'cheer',p:me.id,x:+el.dataset.x}); },
+  guard(el){ const S=APP.S; if(!S||S.sub!=='guard'||!S.gq||!S.gq[0]) return; localAct({t:'guard',p:S.gq[0].t,u:+el.dataset.u}); },
+  useCombo(){ const p=G.cur(APP.S); if(p) localAct({t:'combo',p:p.id}); }, usePassive(){ const p=G.cur(APP.S); if(p) localAct({t:'passive',p:p.id}); },
+  clGuard(el){ const me=clMe(); if(me) clAct({t:'guard',p:me.id,u:+el.dataset.u,q:CL.g.seq}); },
+  clCombo(){ const me=clMe(); if(me) clAct({t:'combo',p:me.id,q:CL.g.seq}); }, clPassive(){ const me=clMe(); if(me) clAct({t:'passive',p:me.id,q:CL.g.seq}); },
   clAlloc(el){ const me=clMe(); if(!me) return; const a=allocAct(me,el.dataset.k); a.q=CL.g.seq; clAct(a); },
 };
 // ===================== 1인용 모드 · 컴퓨터 상대 · 우승 장면 · 스크린샷 =====================
@@ -3957,6 +3995,7 @@ function renderMe(){ const box=$('#me'); if(!box||APP.role!=='one'||!APP.S) retu
   if(S.st==='end') m=`<div class="cm-big">🏆</div>`;
   else if(ANIM.busy) m=`<div class="cm-t">${ANIM.cap||'진행 중…'}</div><p class="cm-w">👀 장면을 보는 중…</p>`;
   else if(!me0.al) m=`<div class="cm-big">😵</div><div class="cm-t">탈락했어요…</div><p class="cm-w">남은 기사들의 싸움을 지켜보세요</p><button class="btn big mint" data-act="oneMap">🗺️ 전체화면으로 보기</button>`;
+  else if(S.sub==='guard'&&S.gq&&S.gq[0]){ const g0=S.gq[0]; m=g0.t===me0.id?guardHTML(S,me0,g0,'guard',false):`<div class="cm-t">⚠️ ${esc(S.players[g0.t].name)} 공격 대응 중…</div>`; }
   else if(S.ph==='roll'){ const r=S.rolls[me.id];
     if(r&&r.st) m=`<div class="cm-big">🚫</div><p class="cm-w">이번 라운드는 움직일 수 없어요 (이동 불가 칸)</p>`;
     else if(r) m=`<div class="cm-t">내 주사위</div><div class="dice">${r.d.map((v,i)=>dieHTML(v,fOf(r,i),'big')).join('')}</div>`;
@@ -3966,7 +4005,7 @@ function renderMe(){ const box=$('#me'); if(!box||APP.role!=='one'||!APP.S) retu
       if(S.sub==='choose') m=`<div class="cm-t">${chooseTitle(S)}</div><div class="tgts">${G.opps(S,p).map(t=>tgtBtn(S,p,t,'pick')).join('')}</div>`;
       else { const cA=G.canAttack(S,p), cS=G.canSkill(S,p);
         if(APP.ui==='atk'&&cA) m=`<div class="cm-t">⚔️ 누구를 공격할까요?</div><div class="tgts">${G.inRange(S,p).map(t=>tgtBtn(S,p,t,'attack')).join('')}</div><button class="btn ghost" data-act="uiBack">← 돌아가기</button>`;
-        else m=`<div class="cm-t">내 차례! 무엇을 할까요?</div>${G.canAlloc(S,p)?allocHTML(p,'alloc'):''}<div class="acts">${cA?`<button class="btn big candy" data-act="uiAtk">⚔️ 일반 공격<small>${G.inRange(S,p).length}명 공격 가능</small></button>`:''}${cS?`<button class="btn big grape" data-act="useSkill">✨ ${esc(c.skill.nm)}<small>${esc(c.skill.ds)}</small></button>`:''}<button class="btn big ghost" data-act="endStep">✅ 끝내기</button></div>`; } }
+        else m=`<div class="cm-t">내 차례! 무엇을 할까요?</div>${G.canAlloc(S,p)?allocHTML(p,'alloc'):''}<div class="acts">${specialBtns(S,p,'')}${cA?`<button class="btn big candy" data-act="uiAtk">⚔️ 일반 공격<small>${G.inRange(S,p).length}명 공격 가능</small></button>`:''}${cS?`<button class="btn big grape" data-act="useSkill">✨ ${esc(c.skill.nm)}<small>${esc(c.skill.ds)}</small></button>`:''}<button class="btn big ghost" data-act="endStep">✅ 끝내기</button></div>`; } }
     else m=`<div class="cm-t">${cur?`🤖 ${esc(cur.name)} 차례`:'진행 중…'}</div><p class="cm-w">컴퓨터가 생각하는 중이에요…</p>`; }
   box.style.setProperty('--pc',pcol(me.id));
   const html=`<div class="me-top"><span class="rnd">라운드 <b>${D.round}</b></span><span class="sp"></span><button class="btn sm mint" data-act="oneMap">🗺️ 전체화면 보기</button><button class="ib" data-act="menu" title="메뉴">☰</button></div>${pvInner(D,me,m)}`;
@@ -3981,8 +4020,12 @@ function aiDo(a,p){ let r=gameAct(APP.S,a); if(!r.ok&&p) r=gameAct(APP.S,{t:'end
 function aiStep(){ const S=APP.S; if(APP.role!=='one'||!S||S.st!=='play'||APP.scr!=='game'||ANIM.busy) return;
   if(S.ph==='roll'){ const need=G.needRoll(S); if(!need.length||need.some(p=>p.own==='host')) return;
     const ids=need.map(p=>p.id); aiDo({t:'rollall',ids,sk:ids.filter(id=>G.canPre(S,S.players[id])&&Math.random()<.5)}); return; }
-  if(S.ph!=='res') return; const p=G.cur(S); if(!p||p.own!=='ai') return;
+  if(S.ph!=='res') return;
+  if(S.sub==='guard'&&S.gq&&S.gq[0]){ const g0=S.gq[0]; const T=S.players[g0.t]; if(T.own==='ai') aiDo({t:'guard',p:T.id,u:guardRec(T,g0)?1:0}); return; }
+  const p=G.cur(S); if(!p||p.own!=='ai') return;
   if(S.sub==='choose'){ const o=G.opps(S,p).sort((a,b)=>a.hp-b.hp); if(o[0]) aiDo({t:'pick',p:p.id,x:o[0].id},p); else aiDo({t:'end',p:p.id}); return; }
+  if(G.canCombo(S,p)){ aiDo({t:'combo',p:p.id},p); return; }
+  if(G.canPassive(S,p)){ aiDo({t:'passive',p:p.id},p); return; }
   if(G.canAlloc(S,p)){ aiDo(allocAct(p,recAlloc(p)[0]),p); return; }
   if(G.canSkill(S,p)&&Math.random()<0.8){ aiDo({t:'skill',p:p.id},p); return; }
   if(G.canAttack(S,p)){ const o=G.inRange(S,p).sort((a,b)=>a.hp-b.hp); aiDo({t:'attack',p:p.id,x:o[0].id},p); return; }
@@ -4034,7 +4077,7 @@ Object.assign(ACT,{
 const MM={el:null,svg:null,g:null,pc:{},an:{},raf:0,mode:'',cx:null,cy:null,last:0,key:''};
 function oppHTML(g,me){ const ps=g.players.filter(p=>p.id!==me.id);
   return `<div class="opp">${ps.map(p=>`<div class="opp-i ${p.al?'':'dead'}" style="--pc:${pcol(p.id)}"><span class="av">${charSVG(p.cid,'head')}</span><b>${p.al?fmt(p.hp):'탈락'}</b></div>`).join('')}</div>`; }
-function pvInner(g,me,m){ const turn=/data-act="(clPick|clAttack|clAlloc|clAtkUi|clSkill|clCheer|pick|attack|alloc|uiAtk|useSkill)"/.test(m);
+function pvInner(g,me,m){ const turn=/data-act="(clPick|clAttack|clAlloc|clAtkUi|clSkill|clCheer|clGuard|clCombo|clPassive|pick|attack|alloc|uiAtk|useSkill|guard|useCombo|usePassive)"/.test(m);
   return `${heroHTML(g,me)}<div class="pv${turn?' turn':''}"><div class="pv-map" data-mm></div><div class="pv-act">${m}</div></div>${oppHTML(g,me)}`; }
 function pvWrap(g,me,m,cls){ return `<div class="scr ctrl${cls||''}" style="--pc:${pcol(me.id)}">${pvInner(g,me,m)}</div>`; }
 function mmEnsure(){ if(MM.el) return MM.el; const d=document.createElement('div'); d.className='mm';
