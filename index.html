@@ -393,6 +393,21 @@ input{font:inherit;color:var(--text);-webkit-user-select:text;user-select:text}
 .gd-i{display:flex;gap:8px;align-items:center;text-align:left;font-size:13.5px;margin-bottom:6px}.gd-i .av{width:42px;height:42px;flex:none;border-radius:50%;border:3px solid var(--line);overflow:hidden;background:#fff}.gd-i .av svg{width:100%;height:100%}
 .gd-d{font-size:20px;color:#E8442E}
 .guard .acts{display:flex;flex-direction:column;gap:6px}
+.opp-lv{font-size:10.5px;line-height:1.35;background:var(--pc);color:#fff;border-radius:8px;padding:0 6px;font-weight:700}
+.tsp{position:absolute;left:50%;top:46%;font-style:normal;z-index:4;opacity:0;pointer-events:none;animation:tsp 1.25s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes tsp{0%{opacity:0;transform:translate(-50%,-50%) scale(.3)}18%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.25) rotate(25deg)}}
+.tsflash{position:absolute;inset:0;background:#fff;opacity:0;z-index:1;pointer-events:none;animation:tsfl .55s .22s ease-out}
+@keyframes tsfl{0%{opacity:.85}100%{opacity:0}}
+.t-hurt .tsflash,.t-atkR .tsflash,.t-atkC .tsflash{background:#FFC9C9}.t-heal .tsflash,.t-party .tsflash,.t-lucky .tsflash{background:#D4FFE2}
+.t-storm .tsflash{background:#E2EBFF;animation:tsfl .16s .3s 4}.t-chest .tsflash{background:#FFF1B8}.t-swap .tsflash{background:#EAD9FF}
+.ts-ring{position:absolute;left:50%;top:44%;width:30vmin;height:30vmin;margin:-15vmin 0 0 -15vmin;border-radius:50%;border:7px solid rgba(255,255,255,.9);opacity:0;z-index:2;pointer-events:none;animation:tsring .9s .3s ease-out}
+.ts-ring.r2{animation-delay:.55s;border-color:rgba(255,225,90,.9)}
+@keyframes tsring{0%{opacity:.95;transform:scale(.2)}100%{opacity:0;transform:scale(2.6)}}
+.ts-t,.ts-s{position:relative;z-index:5}
+.t-storm .ts-char svg{animation:redflash .3s .5s 3}
+.t-lucky .ts-char,.t-party .ts-char,.t-chest .ts-char{animation:charjump .75s .25s both,winjump .5s 1s 2}
+.t-swap .ts-char{animation:charjump .75s .25s both,spinme .8s 1s}
+@keyframes spinme{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -2782,7 +2797,8 @@ const BOARD_N=30;
 const TT=(()=>{ const a=new Array(BOARD_N).fill('plain'); a[0]='start';
   const ev=[2,4,5,7,9,10,12,14,16,18,19,21,23,25,27];
   const cyc=['atkR','heal','fwd','duelR','card','stop','atkC','back','hurt','duelC','atkR','heal','card','hurt','duelR'];
-  ev.forEach((p,i)=>a[p]=cyc[i%cyc.length]); return a; })();
+  ev.forEach((p,i)=>a[p]=cyc[i%cyc.length]);
+  [[6,'lucky'],[11,'chest'],[17,'storm'],[22,'swap'],[26,'party']].forEach(x=>a[x[0]]=x[1]); return a; })();
 const PORTAL={}; TT.forEach((t,i)=>{ if(t==='portal'){ let j=i+5; while(TT[j%BOARD_N]!=='plain') j++; PORTAL[i]=j-i; } });
 const TILE_INFO={
   start:{ic:'🏁',nm:'출발지',ds:'지나가거나 도착하면 레벨 업! 에너지 조금 회복 + 능력 충전'},
@@ -2806,8 +2822,11 @@ const REGIONS=[
 function regionOf(i){ for(let r=0;r<REGIONS.length;r++){ const R_=REGIONS[r]; if(R_.from<=R_.to){ if(i>=R_.from&&i<=R_.to) return r; } else if(i>=R_.from||i<=R_.to) return r; } return 0; }
 
 // 균형 혜택 (시뮬레이션으로 맞춘 값): [시작 체력 배수, 레벨업 추가 보너스]
-const BEN={"1": [1.14, 0, 1.0], "2": [1.125, 0, 1.0], "3": [1.0, 0, 0.77], "4": [1.0, 0, 0.72], "5": [1.0, 0, 0.81], "6": [1.0, 0, 0.23], "7": [1.012, 0, 1.0], "8": [1.03, 0, 1.0], "9": [1.0, 0, 0.87], "10": [1.0, 0, 0.66], "11": [1.0, 0, 0.82], "12": [1.016, 0, 1.0], "13": [1.01, 0, 1.0], "14": [1.3, 0, 1.0], "15": [1.0, 0, 0.9], "16": [1.0, 0, 0.98], "17": [1.0, 0, 0.66], "18": [1.008, 0, 1.0], "19": [1.05, 0, 1.0], "20": [1.01, 0, 1.0]};
-for(const k in BEN){ const c=CHARS[k], b=BEN[k]; c.atk0=c.atk0||c.atk; c.def0=c.def0||c.def; c.hb=b[0]; c.xb=b[1]; const sc=b[2]||1; c.atk=Math.max(1,Math.round(c.atk0*sc)); c.def=Math.max(1,Math.round(c.def0*sc)); }
+const BENS={"2":{"1":[1.67,0,1.0],"2":[1.62,0,1.0],"3":[0.96,0,0.97],"4":[0.57,0,0.68],"5":[1.0,0,1.0],"6":[0.66,0,0.76],"7":[1.3,0,1.0],"8":[1.37,0,1.0],"9":[1.16,0,1.0],"10":[0.89,0,0.93],"11":[1.0,0,1.0],"12":[1.23,0,1.0],"13":[1.01,0,1.0],"14":[3.17,0,1.0],"15":[1.08,0,1.0],"16":[0.94,0,0.96],"17":[0.85,0,0.9],"18":[0.73,0,0.81],"19":[0.97,0,0.98],"20":[0.99,0,0.99]},"3":{"1":[1.41,0,1.0],"2":[1.34,0,1.0],"3":[0.97,0,0.98],"4":[0.73,0,0.81],"5":[0.97,0,0.98],"6":[0.75,0,0.82],"7":[1.1,0,1.0],"8":[1.17,0,1.0],"9":[1.0,0,1.0],"10":[0.9,0,0.93],"11":[0.96,0,0.97],"12":[1.09,0,1.0],"13":[1.07,0,1.0],"14":[1.79,0,1.0],"15":[1.0,0,1.0],"16":[0.99,0,0.99],"17":[0.93,0,0.95],"18":[0.95,0,0.97],"19":[1.1,0,1.0],"20":[1.03,0,1.0]},"4":{"1":[1.3,0,1.0],"2":[1.25,0,1.0],"3":[0.96,0,0.97],"4":[0.85,0,0.9],"5":[0.94,0,0.96],"6":[0.81,0,0.87],"7":[1.03,0,1.0],"8":[1.05,0,1.0],"9":[0.97,0,0.98],"10":[0.91,0,0.94],"11":[0.94,0,0.96],"12":[1.03,0,1.0],"13":[1.05,0,1.0],"14":[1.56,0,1.0],"15":[0.96,0,0.98],"16":[1.0,0,1.0],"17":[0.93,0,0.95],"18":[0.99,0,0.99],"19":[1.08,0,1.0],"20":[1.02,0,1.0]},"5":{"1":[1.27,0,1.0],"2":[1.23,0,1.0],"3":[0.96,0,0.97],"4":[0.93,0,0.95],"5":[0.94,0,0.96],"6":[0.86,0,0.9],"7":[1.0,0,1.0],"8":[1.04,0,1.0],"9":[0.95,0,0.97],"10":[0.92,0,0.95],"11":[0.95,0,0.96],"12":[1.0,0,1.0],"13":[1.02,0,1.0],"14":[1.42,0,1.0],"15":[0.96,0,0.97],"16":[1.0,0,1.0],"17":[0.94,0,0.96],"18":[1.0,0,1.0],"19":[1.07,0,1.0],"20":[1.01,0,1.0]},"6":{"1":[1.24,0,1.0],"2":[1.17,0,1.0],"3":[0.96,0,0.97],"4":[0.96,0,0.97],"5":[0.94,0,0.96],"6":[0.88,0,0.92],"7":[0.99,0,0.99],"8":[1.03,0,1.0],"9":[0.95,0,0.96],"10":[0.93,0,0.95],"11":[0.94,0,0.96],"12":[1.0,0,1.0],"13":[1.02,0,1.0],"14":[1.32,0,1.0],"15":[0.95,0,0.97],"16":[1.0,0,1.0],"17":[0.94,0,0.96],"18":[1.01,0,1.0],"19":[1.07,0,1.0],"20":[1.0,0,1.0]},"7":{"1":[1.24,0,1.0],"2":[1.18,0,1.0],"3":[0.97,0,0.98],"4":[0.98,0,0.99],"5":[0.95,0,0.97],"6":[0.91,0,0.94],"7":[1.0,0,1.0],"8":[1.03,0,1.0],"9":[0.96,0,0.97],"10":[0.94,0,0.96],"11":[0.96,0,0.97],"12":[1.0,0,1.0],"13":[1.02,0,1.0],"14":[1.32,0,1.0],"15":[0.96,0,0.97],"16":[1.02,0,1.0],"17":[0.95,0,0.97],"18":[1.03,0,1.0],"19":[1.08,0,1.0],"20":[1.02,0,1.0]},"8":{"1":[1.25,0,1.0],"2":[1.18,0,1.0],"3":[0.97,0,0.98],"4":[0.99,0,0.99],"5":[0.95,0,0.97],"6":[0.92,0,0.94],"7":[1.0,0,1.0],"8":[1.03,0,1.0],"9":[0.95,0,0.97],"10":[0.95,0,0.96],"11":[0.96,0,0.97],"12":[1.0,0,1.0],"13":[1.02,0,1.0],"14":[1.29,0,1.0],"15":[0.97,0,0.98],"16":[1.02,0,1.0],"17":[0.96,0,0.97],"18":[1.03,0,1.0],"19":[1.08,0,1.0],"20":[1.01,0,1.0]}};
+var BEN_OVR=null;
+function benTable(n){ return BEN_OVR||BENS[Math.max(2,Math.min(8,n|0))]; }
+for(let k=1;k<=20;k++){ const c=CHARS[k]; c.atk0=c.atk; c.def0=c.def; }
+(function(){ const b=BENS[4]; for(let k=1;k<=20;k++){ const c=CHARS[k], x=b[k]||[1,0,1]; c.hb=x[0]; c.atk=Math.max(1,Math.round(c.atk0*x[2])); c.def=Math.max(1,Math.round(c.def0*x[2])); } })(); // 도감 표시는 4~5인 기준
 
 Object.assign(TILE_INFO,{
   plain:{ic:'⭐',nm:'일반칸',ds:'아무 효과 없는 기본 칸'},
@@ -3233,8 +3252,8 @@ const RULES = {hpGrow:0.05, lapHeal:0.05, heal:0.05, trap:0.03, trHeal:0.1, trHe
 const AMT = (s,k)=>Math.round(s.set.hp*RULES[k]);
 
 const G = {
-  atk(p){ return CHARS[p.cid].atk+(p.ab||0); },
-  def(p){ return CHARS[p.cid].def+(p.db||0); },
+  atk(p){ return (p.ba!=null?p.ba:CHARS[p.cid].atk)+(p.ab||0); },
+  def(p){ return (p.bd!=null?p.bd:CHARS[p.cid].def)+(p.db||0); },
   dice(p){ const c=CHARS[p.cid], n=c.dice.n, x=p.dx||0; const fs=[]; for(let i=0;i<n;i++) fs.push(c.dice.f+Math.floor(x/n)+(i<x%n?1:0)); return {n, f:fs[0], fs}; },
   dist(a,b){ const d=Math.abs(a-b)%BOARD_N; return Math.min(d,BOARD_N-d); },
   opps(s,p){ return s.players.filter(o=>o.al&&o.id!==p.id); },
@@ -3259,7 +3278,8 @@ const G = {
 
 function newGame(roster, set){
   const players = roster.map((r,i)=>{ const c=CHARS[r.cid];
-    return {id:i, name:r.name, cid:r.cid, own:r.own||'local', pos:0, lap:0, lv:1, hp:Math.round(set.hp*(c.hb||1)), mhp:Math.round(set.hp*(c.hb||1)),
+    const bb=(benTable(roster.length)[r.cid])||[1,0,1];
+    return {id:i, name:r.name, cid:r.cid, own:r.own||'local', pos:0, lap:0, lv:1, hp:Math.round(set.hp*bb[0]), mhp:Math.round(set.hp*bb[0]), ba:Math.max(1,Math.round(c.atk0*bb[2])), bd:Math.max(1,Math.round(c.def0*bb[2])),
       sk:c.skill?1:0, skl:0, tk:c.token?c.token.st:0, al:1, pv:0, bp:0, ab:0, db:0, dx:0, stun:0}; });
   return {v:2, st:'play', set:{hp:set.hp, range:set.range, sd:set.sd==null?30:set.sd}, players, round:1,
     ph:'roll', rolls:{}, order:[], ci:-1, sub:null, pd:null, fl:{att:0,sk:0}, win:-1, out:[], seq:0};
@@ -3420,6 +3440,12 @@ function landOn(s,p,ev,depth){
   else if(ty==='fwd'||ty==='back'){ p.emo=s.round*10+(ty==='fwd'?1:2); const d=G.dice(p); const r=d.fs.map(q=>RNG.d(q)); ev.push({e:'tile',p:p.id,ty}); ev.push({e:'xroll',p:p.id,d:r,f:d.f,fs:d.fs,x:1,why:ty});
     let n=sumArr(r); if(ty==='fwd') moveBy(s,p,n,ev,'dash'); else { n=Math.min(n,p.pos); if(n>0){ const from=p.pos; p.pos-=n; ev.push({e:'move',p:p.id,from,n:-n,k:'back'}); } }
     if(depth<1&&s.st==='play') return landOn(s,p,ev,depth+1); }
+  else if(ty==='lucky'){ p.bp+=10; ev.push({e:'tile',p:p.id,ty,v:10}); }
+  else if(ty==='chest'){ const c=CHARS[p.cid]; const ops=['heal']; if(c.skill) ops.push('skill'); if(c.token&&p.tk<c.token.mx) ops.push('token'); const k=RNG.pick(ops);
+    if(k==='skill'){ p.sk=Math.min(9,p.sk+1); ev.push({e:'tile',p:p.id,ty,k}); } else if(k==='token'){ p.tk++; ev.push({e:'tile',p:p.id,ty,k,tt:c.token.k}); } else { const v=Math.min(Math.round(p.mhp*0.1),p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,k,v}); } }
+  else if(ty==='storm'){ const tg=G.opps(s,p).filter(t=>G.dist(p.pos,t.pos)<=3); ev.push({e:'tile',p:p.id,ty,n:tg.length}); if(tg.length) strike(s,p,tg,G.atk(p)*2,'tile','번개 구름','공격력×2',ev); }
+  else if(ty==='swap'){ const o=G.opps(s,p); if(o.length){ const t=RNG.pick(o); const a1=p.pos, b1=t.pos; ev.push({e:'tile',p:p.id,ty,by:t.id}); if(a1!==b1){ p.pos=b1; t.pos=a1; ev.push({e:'move',p:p.id,from:a1,n:(b1-a1+BOARD_N)%BOARD_N,k:'warp'}); ev.push({e:'move',p:t.id,from:b1,n:(a1-b1+BOARD_N)%BOARD_N,k:'warp'}); } } else ev.push({e:'tile',p:p.id,ty}); }
+  else if(ty==='party'){ const all=[]; for(const q of G.alive(s)){ const v=Math.min(Math.round(q.mhp*(q.id===p.id?0.1:0.05)),q.mhp-q.hp); q.hp+=v; all.push([q.id,v]); } ev.push({e:'tile',p:p.id,ty,all}); }
   else if(ty==='card'){
     const k=RNG.pick(['heal','hit','ambush','guard','blast']);
     const n=RULES.cardMin+10*Math.floor(Math.random()*((RULES.cardMax-RULES.cardMin)/10+1));
@@ -3561,11 +3587,11 @@ function peerClientTransport(code){ const P=PeerC(); let mine={}, cb=null, hostP
 
 function packState(s){ return {q:s.seq, r:s.round, st:s.st, ph:s.ph, ci:s.ci, sub:s.sub||0, o:s.order, w:s.win, fl:[s.fl.att,s.fl.sk,s.fl.cb||0], gq:(s.sub==='guard'&&s.gq&&s.gq[0])?[s.gq[0].a,s.gq[0].t,s.gq[0].d,s.gq[0].lb]:0, set:[s.set.hp,s.set.range,s.set.sd],
   R:Object.keys(s.rolls).map(k=>{ const r=s.rolls[k]; return [+k,r.d,r.f,r.b,r.c,r.fs,r.st?1:0]; }),
-  P:s.players.map(p=>[p.name,p.cid,p.own,p.pos,p.lap,p.lv,p.hp,p.mhp,p.sk,p.skl,p.tk,p.al,p.pv,p.bp,p.ab,p.db,p.dx,p.stun||0,p.emo||0]), pk:s.pd?s.pd.k+':'+(s.pd.mode||''):'' }; }
+  P:s.players.map(p=>[p.name,p.cid,p.own,p.pos,p.lap,p.lv,p.hp,p.mhp,p.sk,p.skl,p.tk,p.al,p.pv,p.bp,p.ab,p.db,p.dx,p.stun||0,p.emo||0,p.ba,p.bd]), pk:s.pd?s.pd.k+':'+(s.pd.mode||''):'' }; }
 function unpackState(g){ if(!g||!Array.isArray(g.P)||!Array.isArray(g.set)) return null; const rolls={}; (g.R||[]).forEach(r=>{ rolls[r[0]]={d:r[1]||[],f:r[2],b:r[3],c:r[4],fs:Array.isArray(r[5])?r[5]:null,st:r[6]?1:0}; });
   return {v:2, seq:g.q, round:g.r, st:g.st, ph:g.ph, ci:g.ci, sub:g.sub||null, order:g.o||[], win:g.w, pd:g.pk?{k:String(g.pk).split(':')[0],mode:String(g.pk).split(':')[1]||''}:null, fl:{att:(g.fl||[])[0]||0, sk:(g.fl||[])[1]||0, cb:(g.fl||[])[2]||0}, gq:Array.isArray(g.gq)?[{a:g.gq[0],t:g.gq[1],d:+g.gq[2]||0,lb:String(g.gq[3]||'')}]:[],
     set:{hp:g.set[0],range:g.set[1],sd:g.set[2]}, rolls, out:[],
-    players:g.P.map((a,i)=>({id:i,name:String(a[0]),cid:+a[1]||1,own:a[2],pos:a[3]|0,lap:a[4]|0,lv:a[5]|0,hp:a[6]|0,mhp:a[7]||1,sk:a[8]|0,skl:a[9]|0,tk:a[10]|0,al:a[11]|0,pv:a[12]|0,bp:a[13]|0,ab:a[14]|0,db:a[15]|0,dx:a[16]|0,stun:a[17]|0,emo:a[18]|0})) }; }
+    players:g.P.map((a,i)=>({id:i,name:String(a[0]),cid:+a[1]||1,own:a[2],pos:a[3]|0,lap:a[4]|0,lv:a[5]|0,hp:a[6]|0,mhp:a[7]||1,sk:a[8]|0,skl:a[9]|0,tk:a[10]|0,al:a[11]|0,pv:a[12]|0,bp:a[13]|0,ab:a[14]|0,db:a[15]|0,dx:a[16]|0,stun:a[17]|0,emo:a[18]|0,ba:a[19]==null?undefined:+a[19],bd:a[20]==null?undefined:+a[20]})) }; }
 
 // ---------- 호스트 (메인 화면) ----------
 const HOST={t:null, on:new Set(), gone:{}, seen:{}, ack:{}, rej:{}, kick:{}, jn:{}, last:'', err:'', pubT:0};
@@ -3704,7 +3730,7 @@ function titleHTML(){ const sv=store.get('ank2-save',null); const can=!!(sv&&sv.
   <button class="btn candy wide" data-act="goJoin">🙋 폰으로 참가하기</button>
   ${can?`<button class="btn grape wide" data-act="resume">▶ 이어하기 (라운드 ${sv.S.round})</button>`:''}
   <div class="row2"><button class="btn ghost" data-act="rules">📖 게임 방법</button><button class="btn ghost" data-act="dex">🐾 캐릭터 도감</button></div></div>
-  <div class="foot">🏷️ 버전 10.06 · 회피/막기 직접 선택<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
+  <div class="foot">🏷️ 버전 10.07 · 완성판<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
 function updTitleBan(){ const b=$('#tban'); if(!b) return; const hs=NET.hosts||[];
   b.innerHTML=hs.length?`<div class="hostban">🎮 방 <b>${esc(hs[0])}</b>에서 플레이어를 모으고 있어요!<br><button class="btn sm sun" data-act="jRoom" data-c="${esc(hs[0])}" style="margin-top:6px">🙋 이 방에 참가하기</button></div>`:''; }
 
@@ -3749,7 +3775,7 @@ function rulesHTML(){ const s=APP.S?APP.S.set:APP.set; const pc=k=>Math.round(RU
   <h3>⚔️ 공격</h3><ul><li>일반 공격: ${s.range>=50?'거리 상관없이':'앞뒤 '+s.range+'칸 안의'} 상대 1명에게 <b>주사위 1개 × 공격력</b>.</li><li>받는 피해는 방어력만큼 줄어요 (방어력 50 → 75%, 100 → 60%, 200 → 43%).</li><li>💨 회피나 🛡️ 막기가 남아 있으면 상대 공격 한 번을 막아요.</li></ul>
   <h3>⭐ 레벨 업 (한 바퀴 = 30칸)</h3><ul><li>한 바퀴(30칸) 돌 때마다 레벨 +1 (최대 Lv${MAX_LV})</li><li>✨ 스킬은 레벨 업마다 <b>1개씩 쌓여요</b> (초기화 없음). 내 차례에 원할 때 골라서 써요 (한 차례에 1번)</li><li>보너스 <b>${RULES.bonus}점</b>을 공격력·방어력에 넣거나, ${RULES.diceCost}점을 써서 <b>주사위 1개의 눈 +1</b> (영구 · 예: 6눈 2개 → 7눈 1개 + 6눈 1개)</li><li>적마 · 양 · 돼지 · 상어 · 익룡은 +${RULES.bonusWeak}점 더</li><li>🎁 <b>균형 혜택</b>: 모든 캐릭터의 승률이 같아지도록 캐릭터마다 시작 체력과 레벨업 보너스를 조금씩 더 줘요 (도감에서 확인)</li><li>그 밖에: 최대 체력 +${pc('hpGrow')}%, 체력 ${pc('lapHeal')}% 회복, 스킬 · 회피 · 막기 충전</li></ul>
   <h3>🗺️ 이동 칸 (지도의 절반이 이벤트 칸)</h3><ul><li>⭐ <b>일반칸</b> — 아무 효과 없는 기본 칸</li><li>🎯 <b>랜덤 타인 공격</b> — 무작위 상대 1명을 공격 (주사위 1개 × 공격력)</li><li>🎯 <b>원하는 캐릭터 공격</b> — 고른 상대를 공격</li><li>⚔️ <b>랜덤 타인과 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>⚔️ <b>원하는 캐릭터와 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>🚫 <b>한 번 이동 불가</b> — 다음 라운드 한 번 움직이지 못해요</li><li>💚 <b>치료칸</b> — 체력 회복</li><li>💥 <b>공격당함</b> — 체력 5% 피해 (이 칸에서는 쓰러지지 않아요)</li><li>❓ <b>랜덤칸</b> — 5가지 중 하나: 🧙 도인 회복 100~1000 · 🥷 괴한 -100~1000 · 😈 랜덤 상대에게 방어력 무시 기습당하기 · 🛡️ 방어력 × 내 주사위 합만큼 회복 · 💣 나를 뺀 모두에게 방어력 무시 공격력×3 (이 칸 때문에 쓰러지는 일은 없어요)</li><li>⏩ <b>주사위 재굴림 전진</b> — 다시 굴려 그만큼 앞으로</li><li>⏪ <b>주사위 재굴림 후진</b> — 다시 굴려 그만큼 뒤로</li><li>🌈 무지개 워프: 주사위를 굴릴 때마다 <b>1% 확률</b>로 도착지(출발점)까지 한 번에 이동해서 바로 레벨 업!</li><li>지도 칸의 절반(50칸)이 이벤트 칸이에요</li></ul>
-  <h3>🔥 대혼전</h3><p>${s.sd>0?`${s.sd}라운드부터 모든 공격 피해가 매 라운드 +${pc('sdStep')}%씩 커져요. 게임 설정에서 끌 수 있어요.`:'이번 게임은 대혼전이 꺼져 있어요.'}</p></div>`; }
+  <h3>🎁 클디의 선물 칸</h3><ul><li>🍀 <b>행운의 클로버</b> — 보너스 점수 +10 (공격·방어·주사위에 써요)</li><li>🎁 <b>보물 상자</b> — 스킬 +1 · 회피/막기 +1 · 체력 회복 10% 중 하나</li><li>🌩️ <b>번개 구름</b> — 앞뒤 3칸 안의 상대 모두에게 공격력×2</li><li>🔄 <b>자리 바꾸기</b> — 무작위 상대와 자리를 바꿔요</li><li>🎪 <b>숲속 축제</b> — 모두 체력 +5%, 나는 +10%</li></ul><h3>🔥 대혼전</h3><p>${s.sd>0?`${s.sd}라운드부터 모든 공격 피해가 매 라운드 +${pc('sdStep')}%씩 커져요. 게임 설정에서 끌 수 있어요.`:'이번 게임은 대혼전이 꺼져 있어요.'}</p></div>`; }
 function menuHTML(){ const hostish=APP.role!=='client';
   return `<div class="sheet-h"><b>☰ 메뉴</b><button class="ib" data-act="closeSheet" aria-label="닫기">✕</button></div><div class="sheet-b"><div class="mrow">
   <button class="btn ghost wide" data-act="rules">📖 게임 방법</button><button class="btn ghost wide" data-act="dex">🐾 캐릭터 도감</button>
@@ -4076,7 +4102,7 @@ Object.assign(ACT,{
 // ===================== 개인 화면: 라이브 미니맵 + 3분할 배치 =====================
 const MM={el:null,svg:null,g:null,pc:{},an:{},raf:0,mode:'',cx:null,cy:null,last:0,key:''};
 function oppHTML(g,me){ const ps=g.players.filter(p=>p.id!==me.id);
-  return `<div class="opp">${ps.map(p=>`<div class="opp-i ${p.al?'':'dead'}" style="--pc:${pcol(p.id)}"><span class="av">${charSVG(p.cid,'head')}</span><b>${p.al?fmt(p.hp):'탈락'}</b></div>`).join('')}</div>`; }
+  return `<div class="opp">${ps.map(p=>`<div class="opp-i ${p.al?'':'dead'}" style="--pc:${pcol(p.id)}"><span class="av">${charSVG(p.cid,'head')}</span><small class="opp-lv">Lv ${p.lv}</small><b>${p.al?fmt(p.hp):'탈락'}</b></div>`).join('')}</div>`; }
 function pvInner(g,me,m){ const turn=/data-act="(clPick|clAttack|clAlloc|clAtkUi|clSkill|clCheer|clGuard|clCombo|clPassive|pick|attack|alloc|uiAtk|useSkill|guard|useCombo|usePassive)"/.test(m);
   return `${heroHTML(g,me)}<div class="pv${turn?' turn':''}"><div class="pv-map" data-mm></div><div class="pv-act">${m}</div></div>${oppHTML(g,me)}`; }
 function pvWrap(g,me,m,cls){ return `<div class="scr ctrl${cls||''}" style="--pc:${pcol(me.id)}">${pvInner(g,me,m)}</div>`; }
@@ -4135,7 +4161,7 @@ function applyEv(D,e){ const P=(e.p!=null&&e.p>=0)?D.players[e.p]:null;
     case 'step': D.ci=e.i; D.sub=null; break;
     case 'xx_noop': break;
     case 'move': P.pos=((e.from+e.n)%BOARD_N+BOARD_N)%BOARD_N; break;
-    case 'tile': if(e.ty==='heal'||(e.ty==='card'&&(e.k==='heal'||e.k==='guard'))||(e.ty==='treasure'&&e.tr==='heal')) P.hp=Math.min(P.mhp,P.hp+(e.v||0));
+    case 'tile': applyTile2(D,P,e); if(e.ty==='heal'||(e.ty==='card'&&(e.k==='heal'||e.k==='guard'))||(e.ty==='treasure'&&e.tr==='heal')) P.hp=Math.min(P.mhp,P.hp+(e.v||0));
       else if(e.ty==='trap'||e.ty==='hurt'||(e.ty==='card'&&e.k==='hit')) P.hp=Math.max(1,P.hp-(e.v||0));
       else if(e.ty==='treasure'&&e.tr==='skill'){ P.sk=1; P.skl=0; } else if(e.ty==='treasure'&&e.tr==='token') P.tk++; break;
     case 'skill': if(P) P.sk=Math.max(0,P.sk-1); break;
@@ -4193,14 +4219,15 @@ async function xrollPop(e){ const lb={fwd:'🎲 재굴림 전진!',back:'🎲 �
 const TILE_LINE={atkR:'🎯 랜덤 타인 공격!',atkC:'🎯 원하는 캐릭터 공격!',duelR:'⚔️ 랜덤 타인과 대결!',duelC:'⚔️ 원하는 캐릭터와 대결!',stop:'🚫 한 번 이동 불가!',heal:'💚 치료칸!',hurt:'💥 공격당함!',card:'❓ 랜덤칸!',fwd:'⏩ 재굴림 전진!',back:'⏪ 재굴림 후진!'};
 async function tileFx(e,P){ const ty=e.ty; let sub='';
   if(ty==='heal') sub=e.v?`체력 +${fmt(e.v)}`:'체력이 가득해요'; else if(ty==='hurt') sub=`체력 -${fmt(e.v)}`; else if(ty==='stop') sub='다음 라운드에 움직일 수 없어요';
-  else if(ty==='fwd') sub='😆 주사위를 다시 굴려 앞으로!'; else if(ty==='back') sub='😭 주사위를 다시 굴려 뒤로…'; else if(ty==='atkR'||ty==='duelR') sub='상대를 무작위로 정해요'; else if(ty==='atkC'||ty==='duelC') sub='상대를 직접 골라요';
+  else if(ty==='fwd') sub='😆 주사위를 다시 굴려 앞으로!'; else if(ty==='back') sub='😭 주사위를 다시 굴려 뒤로…'; else if(ty==='atkR'||ty==='duelR') sub='상대를 무작위로 정해요'; else if(ty==='atkC'||ty==='duelC') sub='상대를 직접 골라요'; else if(TILE_SUB2[ty]) sub=TILE_SUB2[ty](e,P);
   if(!TILE_LINE[ty]) return;
   log(`${TILE_LINE[ty]} ${P.name}${sub?' · '+sub:''}`);
   if(ty==='fwd'||ty==='back') P.emo=ANIM.D.round*10+(ty==='fwd'?1:2);
   if(ty==='card'){ await tileScene(ty,P,'❓ 랜덤칸!','무엇이 나올까?',850); return cardFx(e,P); }
   await tileScene(ty,P,TILE_LINE[ty],sub,1300,e); }
 async function tileScene(ty,P,t,sub,ms,e){ sfx(ty==='heal'?'heal':ty==='hurt'?'hit':ty==='stop'?'miss':'pop');
-  const el=fxAdd(`<div class="tscene t-${ty}"><div class="ts-burst"></div><div class="ts-tile"><img src="${TILEIMG[ty]||TILEIMG.plain}" alt=""></div><div class="ts-char">${charSVG(P.cid,'full')}</div><div class="ts-t">${t}</div><div class="ts-s">${esc(P.name)}${sub?' · '+sub:''}</div></div>`);
+  const el=fxAdd(`<div class="tscene t-${ty}"><div class="ts-burst"></div><div class="ts-tile"><img src="${TILEIMG[ty]||TILEIMG.plain}" alt=""></div><div class="ts-char">${charSVG(P.cid,'full')}</div><div class="ts-t">${t}</div><div class="ts-s">${esc(P.name)}${sub?' · '+esc(sub):''}</div></div>`);
+  tsFx(el,ty); if(e&&ty==='party'&&e.all) setTimeout(()=>e.all.forEach(q=>{ if(q[1]) floatTxt(q[0],'+'+fmt(q[1]),'heal'); }),400); if(e&&ty==='chest'&&e.v) setTimeout(()=>floatTxt(e.p,'+'+fmt(e.v),'heal'),400);
   if(e&&(ty==='heal'||ty==='hurt')&&e.v) setTimeout(()=>floatTxt(e.p,(ty==='heal'?'+':'-')+fmt(e.v),ty==='heal'?'heal':'hit'),300);
   await wait(ms); fxDel(el); await wait(120); }
 async function duelFx(e){ const D=ANIM.D; const A=D.players[e.p], B=D.players[e.t]; if(!A||!B) return; sfx('combo');
@@ -4315,6 +4342,41 @@ function sfx(k){ if(APP.mute||APP.tspd) return; switch(k){
   case 'combo': [392,523,659,784].forEach((f,i)=>tone(f,.14,'square',.05,i*.06)); break; case 'heal': tone(620,.25,'sine',.08,0,1040); break;
   case 'warp': tone(280,.4,'sine',.08,0,1300); break; case 'card': tone(480,.1,'triangle',.07,0,720); tone(720,.12,'triangle',.06,.1,960); break;
   case 'join': tone(700,.1,'sine',.08); tone(1050,.12,'sine',.07,.09); break; case 'win': [523,659,784,659,784,1047].forEach((f,i)=>tone(f,.2,'triangle',.09,i*.14)); break; } }
+// ===================== 클디의 선물 칸 5종 · 칸 연출 강화 =====================
+function svgCard(bg,bd,ic,l1,l2){ const s=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'><rect x='6' y='6' width='128' height='128' rx='26' fill='${bg}' stroke='${bd}' stroke-width='7'/><rect x='16' y='14' width='108' height='26' rx='13' fill='#ffffff' opacity='.45'/><text x='70' y='${l2?70:76}' font-size='50' text-anchor='middle'>${ic}</text><text x='70' y='${l2?100:114}' font-size='18' font-weight='800' fill='${bd}' text-anchor='middle' font-family='sans-serif'>${l1}</text>${l2?`<text x='70' y='121' font-size='18' font-weight='800' fill='${bd}' text-anchor='middle' font-family='sans-serif'>${l2}</text>`:''}</svg>`;
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s); }
+Object.assign(TILEIMG,{
+  lucky:svgCard('#E7F9E3','#2E9D55','🍀','행운의','클로버'),
+  chest:svgCard('#FFF2CF','#C47A00','🎁','보물 상자'),
+  storm:svgCard('#E4EAFF','#4554D2','🌩️','번개 구름'),
+  swap:svgCard('#F2E6FF','#8443D4','🔄','자리','바꾸기'),
+  party:svgCard('#FFE6F0','#D93C74','🎪','숲속 축제'),
+});
+Object.assign(TILE_INFO,{
+  lucky:{ic:'🍀',nm:'행운의 클로버',ds:'보너스 점수 +10 (공격·방어·주사위에 써요)'},
+  chest:{ic:'🎁',nm:'보물 상자',ds:'스킬 +1 · 회피/막기 +1 · 체력 회복 중 하나'},
+  storm:{ic:'🌩️',nm:'번개 구름',ds:'앞뒤 3칸 안의 상대 모두에게 공격력×2'},
+  swap:{ic:'🔄',nm:'자리 바꾸기',ds:'무작위 상대와 자리를 바꿔요'},
+  party:{ic:'🎪',nm:'숲속 축제',ds:'모두 체력 +5%, 나는 +10%'},
+});
+Object.assign(TILE_LINE,{lucky:'🍀 행운의 클로버!',chest:'🎁 보물 상자!',storm:'🌩️ 번개 구름!',swap:'🔄 자리 바꾸기!',party:'🎪 숲속 축제!'});
+const TILE_SUB2={
+  lucky:e=>`⭐ 보너스 +${e.v}점! 공격·방어·주사위에 써요`,
+  chest:e=>e.k==='skill'?'✨ 스킬 +1개!':e.k==='token'?(e.tt==='block'?'🛡️ 막기 +1번!':'💨 회피 +1번!'):`💚 체력 +${fmt(e.v||0)}`,
+  storm:e=>e.n?`근처 ${e.n}명에게 번개가 떨어져요!`:'근처에 아무도 없어요… 휴~',
+  swap:e=>{ const Q=e.by!=null&&ANIM.D?ANIM.D.players[e.by]:null; return Q?`${Q.name}와(과) 자리를 바꿔요!`:'바꿀 상대가 없어요'; },
+  party:()=>'모두 체력 +5% · 나는 +10%!',
+};
+function applyTile2(D,P,e){ if(!P) return;
+  if(e.ty==='lucky') P.bp=(P.bp||0)+(e.v||0);
+  else if(e.ty==='chest'){ if(e.k==='skill') P.sk=(P.sk||0)+1; else if(e.k==='token') P.tk=(P.tk||0)+1; else if(e.v) P.hp=Math.min(P.mhp,P.hp+e.v); }
+  else if(e.ty==='party'&&e.all) e.all.forEach(a=>{ const Q=D.players[a[0]]; if(Q) Q.hp=Math.min(Q.mhp,Q.hp+a[1]); }); }
+const TSP={heal:['💚','✨','💖'],party:['🎉','🎊','💖','🎈'],lucky:['🍀','⭐','✨'],chest:['🪙','💎','✨','⭐'],storm:['⚡','⚡','🌩️'],hurt:['💥','💢'],atkR:['🎯','💥'],atkC:['🎯','💥'],duelR:['⚔️','✨'],duelC:['⚔️','✨'],fwd:['💨','😆','⭐'],back:['💦','😭'],stop:['💫','💤'],swap:['🌀','✨'],card:['❓','✨'],plain:['✨']};
+function tsFx(el,ty){ const set=TSP[ty]||TSP.plain; let h='';
+  for(let i=0;i<22;i++){ const a=Math.random()*Math.PI*2, r=26+Math.random()*44;
+    h+=`<i class="tsp" style="--dx:${(Math.cos(a)*r).toFixed(1)}vmin;--dy:${(Math.sin(a)*r).toFixed(1)}vmin;animation-delay:${(0.25+Math.random()*0.55).toFixed(2)}s;font-size:${(18+Math.random()*24).toFixed(0)}px">${set[i%set.length]}</i>`; }
+  el.insertAdjacentHTML('beforeend',`<div class="tsflash"></div><div class="ts-ring"></div><div class="ts-ring r2"></div>${h}`);
+  if(ty==='party'||ty==='heal'||ty==='lucky'||ty==='chest') setTimeout(()=>sfx('lvl'),500); if(ty==='storm') setTimeout(()=>sfx('hit'),450); if(ty==='swap') setTimeout(()=>sfx('warp'),400); }
 // ===================== MAIN =====================
 function onClick(e){ if(APP.scr==='game'&&ANIM.busy&&e.target.closest('#fx')&&!e.target.closest('[data-act]')){ skipNow(); return; }
   const el=e.target.closest('[data-act]'); if(!el||el.tagName==='INPUT'||el.disabled) return; const f=ACT[el.dataset.act]; if(!f) return;
