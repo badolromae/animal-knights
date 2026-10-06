@@ -2771,11 +2771,11 @@ const CHARS=[null,
 ];
 const PCOLORS=['#FF5D73','#3E8BFF','#2FBF71','#FFB400','#9B6BFF','#FF7F32','#FF6FC8','#14B8C4'];
 
-// ----- 보드 100칸 -----
-const BOARD_N=100;
+// ----- 보드 30칸 -----
+const BOARD_N=30;
 const TT=(()=>{ const a=new Array(BOARD_N).fill('plain'); a[0]='start';
-  const ev=[3,5,7,8,10,12,13,15,18,21,23,25,27,29,31,34,36,38,41,43,44,47,49,50,52,55,57,58,60,62,63,65,67,69,71,73,76,77,80,83,84,86,87,89,90,91,93,95,96,98];
-  const cyc=['atkR','heal','fwd','duelR','card','stop','atkC','back','hurt','duelC'];
+  const ev=[2,4,5,7,9,10,12,14,16,18,19,21,23,25,27];
+  const cyc=['atkR','heal','fwd','duelR','card','stop','atkC','back','hurt','duelC','atkR','heal','card','hurt','duelR'];
   ev.forEach((p,i)=>a[p]=cyc[i%cyc.length]); return a; })();
 const PORTAL={}; TT.forEach((t,i)=>{ if(t==='portal'){ let j=i+5; while(TT[j%BOARD_N]!=='plain') j++; PORTAL[i]=j-i; } });
 const TILE_INFO={
@@ -2800,8 +2800,8 @@ const REGIONS=[
 function regionOf(i){ for(let r=0;r<REGIONS.length;r++){ const R_=REGIONS[r]; if(R_.from<=R_.to){ if(i>=R_.from&&i<=R_.to) return r; } else if(i>=R_.from||i<=R_.to) return r; } return 0; }
 
 // 균형 혜택 (시뮬레이션으로 맞춘 값): [시작 체력 배수, 레벨업 추가 보너스]
-const BEN={"1": [1.4, 4], "2": [1.41, 4], "3": [1.25, 2], "4": [1.0, 0], "5": [1.42, 4], "6": [1.33, 3], "7": [1.33, 3], "8": [1.33, 3], "9": [1.36, 4], "10": [1.35, 4], "11": [1.32, 3], "12": [1.36, 4], "13": [1.53, 5], "14": [1.48, 5], "15": [1.36, 4], "16": [1.2, 2], "17": [1.36, 4], "18": [1.39, 4], "19": [1.33, 3], "20": [1.46, 5]};
-for(const k in BEN){ CHARS[k].hb=BEN[k][0]; CHARS[k].xb=BEN[k][1]; }
+const BEN={"1": [1.16, 0, 1.0], "2": [1.13, 0, 1.0], "3": [1.0, 0, 0.85], "4": [1.0, 0, 0.55], "5": [1.0, 0, 0.98], "6": [1.0, 0, 0.33], "7": [1.05, 0, 1.0], "8": [1.09, 0, 1.0], "9": [1.0, 0, 0.88], "10": [1.0, 0, 0.68], "11": [1.0, 0, 0.98], "12": [1.07, 0, 1.0], "13": [1.2, 0, 1.0], "14": [1.41, 0, 1.0], "15": [1.0, 0, 0.95], "16": [1.0, 0, 0.96], "17": [1.0, 0, 0.8], "18": [1.0, 0, 1.0], "19": [1.1, 0, 1.0], "20": [1.04, 0, 1.0]};
+for(const k in BEN){ const c=CHARS[k], b=BEN[k]; c.atk0=c.atk0||c.atk; c.def0=c.def0||c.def; c.hb=b[0]; c.xb=b[1]; const sc=b[2]||1; c.atk=Math.max(1,Math.round(c.atk0*sc)); c.def=Math.max(1,Math.round(c.def0*sc)); }
 
 Object.assign(TILE_INFO,{
   plain:{ic:'⭐',nm:'일반칸',ds:'아무 효과 없는 기본 칸'},
@@ -3092,7 +3092,7 @@ const REGION_SAND=['#F9E7B0','#F4E2A8','#DCEEFC','#CDA986','#FBE3A2','#FFF0C2'];
 function _isBridge(i){ const r=regionOf(i); for(const d of [-2,-1,1,2]){ const j=(i+d+BOARD_N)%BOARD_N; if(regionOf(j)!==r) return true; } return false; }
 const LANDMARKS=(()=>{ // 지역별 대표 건물 위치: 지역 가운데 칸에서 바깥쪽
   const mid=[0,21,38,54,71,86], off=[150,140,150,150,145,140], side=[-1,1,1,1,1,1];
-  return REGIONS.map((R_,r)=>{ const t=TILES[mid[r]]; return {r, x:Math.max(110,Math.min(1490,t.x+t.nx*off[r]*side[r])), y:Math.max(110,Math.min(1470,t.y+t.ny*off[r]*side[r]))}; }); })();
+  return REGIONS.map((R_,r)=>{ const t=TILES[Math.round(mid[r]*BOARD_N/100)%BOARD_N]; return {r, x:Math.max(110,Math.min(1490,t.x+t.nx*off[r]*side[r])), y:Math.max(110,Math.min(1470,t.y+t.ny*off[r]*side[r]))}; }); })();
 
 function _deco(kind,x,y,s,rnd){ // 작은 장식
   const g=(inner)=>`<g transform="translate(${x.toFixed(0)},${y.toFixed(0)}) scale(${s.toFixed(2)})">${inner}</g>`;
@@ -3199,7 +3199,7 @@ function _oldMapSVG(){
 }
 
 // 새 지도: 사용자 그림(화산섬) 위에 그림 속 발판만 한 칸 표시
-const TILE_SZ=(()=>{ let L=0; for(let i=0;i<BOARD_N;i++){ const a=TILES[i], b=TILES[(i+1)%BOARD_N]; L+=Math.hypot(b.x-a.x,b.y-a.y); } return Math.min(64,Math.floor(L/BOARD_N*0.94)); })();
+const TILE_SZ=(()=>{ let L=0; for(let i=0;i<BOARD_N;i++){ const a=TILES[i], b=TILES[(i+1)%BOARD_N]; L+=Math.hypot(b.x-a.x,b.y-a.y); } return Math.min(130,Math.floor(L/BOARD_N*0.9)); })();
 const Rr=(x,y,w,h,rx,f,sw,ex)=>`<rect x="${(+x).toFixed(1)}" y="${(+y).toFixed(1)}" width="${(+w).toFixed(1)}" height="${(+h).toFixed(1)}" rx="${rx}" fill="${f}"${_ol(sw)}${ex||''}/>`;
 const TILE_NM={duel:'결투',card:'카드',heal:'회복',treasure:'보물',portal:'포털',fwd:'전진',back:'후진'};
 function buildMapSVG(){ let tiles=''; const S=TILE_SZ, h=S/2;
@@ -3310,7 +3310,7 @@ function comboHit(c, vals){
 
 function doRoll(s,p,boost,ev){
   const d=G.dice(p); const fs=boost?d.fs.concat(d.fs):d.fs; const dice=fs.map(q=>RNG.d(q));
-  if(boost){ p.sk=0; p.skl=0; ev.push({e:'skill',p:p.id,nm:CHARS[p.cid].skill.nm}); }
+  if(boost){ p.sk=Math.max(0,p.sk-1); ev.push({e:'skill',p:p.id,nm:CHARS[p.cid].skill.nm}); }
   const c=CHARS[p.cid].combo; const hit=!boost&&!!c&&comboHit(c,dice);
   s.rolls[p.id]={d:dice,f:d.f,fs,b:boost?1:0,c:hit?1:0};
   ev.push({e:'roll',p:p.id,d:dice,f:d.f,fs,b:boost?1:0,c:hit?1:0});
@@ -3386,7 +3386,7 @@ function lapDone(s,p,ev,queued){
   const c=CHARS[p.cid]; p.lap++;
   let up=0, g=0; if(p.lv<MAX_LV){ p.lv++; p.mhp+=AMT(s,'hpGrow'); g=RULES.bonus+(c.weak?RULES.bonusWeak:0)+(c.xb||0); p.bp+=g; up=1; }
   const h=Math.min(Math.round(p.mhp*RULES.lapHeal), p.mhp-p.hp); p.hp+=h;
-  if(c.skill){ if(c.skill.t==='shark6'){ if(p.sk<1){ p.skl++; if(p.skl>=2){ p.sk=1; p.skl=0; } } } else if(p.sk<1) p.sk=1; }
+  if(c.skill&&up){ if(c.skill.t==='shark6'){ p.skl++; if(p.skl>=2){ p.sk=Math.min(9,p.sk+1); p.skl=0; } } else p.sk=Math.min(9,p.sk+1); }
   if(c.token){ p.tk=Math.min(c.token.mx, p.tk+c.token.inc); }
   ev.push({e:'lap',p:p.id,lv:p.lv,up,h,g,bp:p.bp,sk:p.sk,skl:p.skl,tk:p.tk,mhp:p.mhp,lap:p.lap});
   if(c.passive&&c.passive.t==='lapAll'){ if(queued) p.pv++; else passive(s,p,ev); }
@@ -3459,7 +3459,7 @@ function checkWin(s,ev){
 }
 
 function doSkill(s,p,ev){
-  const sk=CHARS[p.cid].skill; p.sk=0; s.fl.sk=1; const a=G.atk(p); const d=G.dice(p);
+  const sk=CHARS[p.cid].skill; p.sk=Math.max(0,p.sk-1); s.fl.sk=1; const a=G.atk(p); const d=G.dice(p);
   ev.push({e:'skill',p:p.id,nm:sk.nm});
   const o=G.opps(s,p);
   if(o.length){
@@ -3654,7 +3654,7 @@ function lvBonus(c){ return RULES.bonus+(c.weak?RULES.bonusWeak:0)+(c.xb||0); }
 function benTxt(c){ const h=Math.round(((c.hb||1)-1)*100); return h>0?`🎁 균형 혜택: 시작 체력 +${h}%`:''; }
 function tokenDesc(c){ const t=c.token, w=t.k==='block'?'막기':'회피'; return `상대의 공격 한 번을 ${w} (처음 ${t.st}번${t.mx<99?`, 최대 ${t.mx}번`:', 계속 쌓여요'} · 레벨 업마다 +${t.inc})`; }
 function abil(c){ const L=[];
-  if(c.skill) L.push(['✨ 스킬 · '+c.skill.nm, c.skill.ds+(c.skill.t==='shark6'?'':' · 한 바퀴마다 충전')]);
+  if(c.skill) L.push(['✨ 스킬 · '+c.skill.nm, c.skill.ds+(c.skill.t==='shark6'?' · 2레벨마다 +1개 (계속 쌓여요)':' · 레벨 업마다 +1개 (계속 쌓여요)')]);
   if(c.combo) L.push(['💥 콤보 · '+c.combo.nm, c.combo.ds]);
   if(c.token) L.push([c.token.k==='block'?'🛡️ 막기':'💨 회피', tokenDesc(c)]);
   if(c.passive) L.push(['⚡ 패시브 · '+c.passive.nm, c.passive.ds]);
@@ -3727,7 +3727,7 @@ function rulesHTML(){ const s=APP.S?APP.S.set:APP.set; const pc=k=>Math.round(RU
   <h3>🎯 목표</h3><p>동물 기사들이 세계 지도를 돌며 싸워요. 마지막까지 살아남은 기사가 승리!</p>
   <h3>🎲 한 라운드</h3><ul><li>모두 <b>동시에</b> 주사위를 굴리고, 모든 말이 한꺼번에 이동해요.</li><li>그다음 <b>맨 앞에 있는 사람부터</b> 차례로 특수상황을 진행해요: 콤보 → 도착한 칸 → 보너스 · 공격 · 스킬.</li><li>메인 화면 하나로 할 때는 메인에서 모두 진행하고, 폰을 연결하면 각자 폰에서 굴리고 골라요.</li></ul>
   <h3>⚔️ 공격</h3><ul><li>일반 공격: ${s.range>=50?'거리 상관없이':'앞뒤 '+s.range+'칸 안의'} 상대 1명에게 <b>주사위 1개 × 공격력</b>.</li><li>받는 피해는 방어력만큼 줄어요 (방어력 50 → 75%, 100 → 60%, 200 → 43%).</li><li>💨 회피나 🛡️ 막기가 남아 있으면 상대 공격 한 번을 막아요.</li></ul>
-  <h3>⭐ 레벨 업 (한 바퀴 = 100칸)</h3><ul><li>한 바퀴 돌 때마다 레벨 +1 (최대 Lv${MAX_LV})</li><li>보너스 <b>${RULES.bonus}점</b>을 공격력·방어력에 넣거나, ${RULES.diceCost}점을 써서 <b>주사위 1개의 눈 +1</b> (영구 · 예: 6눈 2개 → 7눈 1개 + 6눈 1개)</li><li>적마 · 양 · 돼지 · 상어 · 익룡은 +${RULES.bonusWeak}점 더</li><li>🎁 <b>균형 혜택</b>: 모든 캐릭터의 승률이 같아지도록 캐릭터마다 시작 체력과 레벨업 보너스를 조금씩 더 줘요 (도감에서 확인)</li><li>그 밖에: 최대 체력 +${pc('hpGrow')}%, 체력 ${pc('lapHeal')}% 회복, 스킬 · 회피 · 막기 충전</li></ul>
+  <h3>⭐ 레벨 업 (한 바퀴 = 30칸)</h3><ul><li>한 바퀴(30칸) 돌 때마다 레벨 +1 (최대 Lv${MAX_LV})</li><li>✨ 스킬은 레벨 업마다 <b>1개씩 쌓여요</b> (초기화 없음). 내 차례에 원할 때 골라서 써요 (한 차례에 1번)</li><li>보너스 <b>${RULES.bonus}점</b>을 공격력·방어력에 넣거나, ${RULES.diceCost}점을 써서 <b>주사위 1개의 눈 +1</b> (영구 · 예: 6눈 2개 → 7눈 1개 + 6눈 1개)</li><li>적마 · 양 · 돼지 · 상어 · 익룡은 +${RULES.bonusWeak}점 더</li><li>🎁 <b>균형 혜택</b>: 모든 캐릭터의 승률이 같아지도록 캐릭터마다 시작 체력과 레벨업 보너스를 조금씩 더 줘요 (도감에서 확인)</li><li>그 밖에: 최대 체력 +${pc('hpGrow')}%, 체력 ${pc('lapHeal')}% 회복, 스킬 · 회피 · 막기 충전</li></ul>
   <h3>🗺️ 이동 칸 (지도의 절반이 이벤트 칸)</h3><ul><li>⭐ <b>일반칸</b> — 아무 효과 없는 기본 칸</li><li>🎯 <b>랜덤 타인 공격</b> — 무작위 상대 1명을 공격 (주사위 1개 × 공격력)</li><li>🎯 <b>원하는 캐릭터 공격</b> — 고른 상대를 공격</li><li>⚔️ <b>랜덤 타인과 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>⚔️ <b>원하는 캐릭터와 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>🚫 <b>한 번 이동 불가</b> — 다음 라운드 한 번 움직이지 못해요</li><li>💚 <b>치료칸</b> — 체력 회복</li><li>💥 <b>공격당함</b> — 체력 5% 피해 (이 칸에서는 쓰러지지 않아요)</li><li>❓ <b>랜덤칸</b> — 5가지 중 하나: 🧙 도인 회복 100~1000 · 🥷 괴한 -100~1000 · 😈 랜덤 상대에게 방어력 무시 기습당하기 · 🛡️ 방어력 × 내 주사위 합만큼 회복 · 💣 나를 뺀 모두에게 방어력 무시 공격력×3 (이 칸 때문에 쓰러지는 일은 없어요)</li><li>⏩ <b>주사위 재굴림 전진</b> — 다시 굴려 그만큼 앞으로</li><li>⏪ <b>주사위 재굴림 후진</b> — 다시 굴려 그만큼 뒤로</li><li>🌈 무지개 워프: 주사위를 굴릴 때마다 <b>1% 확률</b>로 도착지(출발점)까지 한 번에 이동해서 바로 레벨 업!</li><li>지도 칸의 절반(50칸)이 이벤트 칸이에요</li></ul>
   <h3>🔥 대혼전</h3><p>${s.sd>0?`${s.sd}라운드부터 모든 공격 피해가 매 라운드 +${pc('sdStep')}%씩 커져요. 게임 설정에서 끌 수 있어요.`:'이번 게임은 대혼전이 꺼져 있어요.'}</p></div>`; }
 function menuHTML(){ const hostish=APP.role!=='client';
@@ -3759,7 +3759,7 @@ function mountGame(){ $('#scr').innerHTML=`<div class="scr game" id="game"><div 
 function renderTop(){ const el=$('#rnd'); const D=ANIM.D||APP.S; if(!el||!D) return; const s=D.set;
   el.innerHTML=`라운드 <b>${D.round}</b>${G.sd(D)?`<span class="sdt">🔥 대혼전 ×${Math.round(G.sdMul(D)*100)/100}</span>`:(s.sd>0&&D.round>=s.sd-5?`<span class="sdt">🔥 ${s.sd-D.round}R 뒤 대혼전</span>`:'')}`; }
 function renderChips(){ if(APP.role==='one') renderMe(); const el=$('#chips'); const D=ANIM.D; if(!el||!D) return; const cur=G.cur(D);
-  el.innerHTML=D.players.map(p=>{ const c=CHARS[p.cid]; const r=D.rolls[p.id]; const tk=c.token?(c.token.k==='block'?' 🛡':' 💨')+p.tk:''; const sk=c.skill&&p.sk>=1?' ✨':''; const rem=!isLocalP(p)?(HOST.on.has(p.own)?' 📱':' 📵'):'';
+  el.innerHTML=D.players.map(p=>{ const c=CHARS[p.cid]; const r=D.rolls[p.id]; const tk=c.token?(c.token.k==='block'?' 🛡':' 💨')+p.tk:''; const sk=c.skill&&p.sk>=1?' ✨'+p.sk:''; const rem=!isLocalP(p)?(HOST.on.has(p.own)?' 📱':' 📵'):'';
     return `<div class="chip ${cur&&cur.id===p.id?'cur':''} ${p.al?'':'dead'}" style="--pc:${pcol(p.id)}" data-act="chipTap" data-p="${p.id}"><div class="av">${charSVG(p.cid,'head')}</div><div class="ci"><div class="nm">${esc(p.name)} <small>Lv${p.lv}${p.bp>0?' ⭐':''}</small></div><div class="hp ${hpCls(p)}"><i style="width:${Math.max(0,p.hp/p.mhp*100)}%"></i></div><div class="cs">${p.al?fmt(p.hp):'탈락'}${tk}${sk}${rem}</div></div>${D.ph==='roll'&&p.al?(r?(r.st?'<span class="rb">🚫</span>':`<span class="rb ok">✓${sumArr(r.d)}</span>`):'<span class="rb">🎲</span>'):''}</div>`; }).join(''); }
 function renderDock(){ if(APP.role==='one') renderMe(); const el=$('#dock'); const S=APP.S; if(!el||!S) return;
   if(ANIM.busy){ el.innerHTML=`<div class="dk-cap">${ANIM.cap||'…'}</div><div class="dk-hint">화면을 누르면 빨리 넘어가요</div>`; return; }
@@ -3819,7 +3819,7 @@ function joinHTML(){ const mode=netMode(); const h=CL.hp; let body='';
   return `<div class="scr join"><div class="bar"><button class="ib" data-act="home" aria-label="뒤로">←</button><h2>🙋 폰으로 참가하기</h2></div><div class="join-b scroll">${body}</div></div>`; }
 function heroHTML(g,me){ const c=CHARS[me.cid];
   const em=(me.emo&&Math.floor(me.emo/10)===g.round)?(me.emo%10===1?'<div class="emo e-joy">😆<small>신나요!</small></div>':'<div class="emo e-sad">😭<small>흑흑…</small></div>'):'';
-  const tk=c.token?`<span>${c.token.k==='block'?'🛡️ 막기':'💨 회피'} <b>${me.tk}</b></span>`:''; const sk=c.skill?`<span>✨ 스킬 <b>${me.sk>=1?'준비':'충전 중'}</b></span>`:'';
+  const tk=c.token?`<span>${c.token.k==='block'?'🛡️ 막기':'💨 회피'} <b>${me.tk}</b></span>`:''; const sk=c.skill?`<span>✨ 스킬 <b>${me.sk>=1?me.sk+'개':'충전 중'}</b></span>`:'';
   return `<div class="hero"><div class="hero-art"><div class="ha-in">${charSVG(me.cid,'full')}</div>${em}</div><div class="hero-i"><div class="hero-n"><b>${esc(me.name)}</b><em>Lv ${me.lv}</em>${me.bp>0?`<em class="bp">⭐ ${me.bp}점</em>`:''}</div>
   <div class="hp big ${hpCls(me)}"><i style="width:${Math.max(0,me.hp/me.mhp*100)}%"></i><span>❤️ ${fmt(me.hp)} / ${fmt(me.mhp)}</span></div>
   <div class="stg"><span>⚔️ 공격 <b>${G.atk(me)}</b></span><span>🛡️ 방어 <b>${G.def(me)}</b></span><span class="w">🎲 주사위 <b>${diceLbl(me)}</b></span>${tk}${sk}</div></div></div>`; }
@@ -4056,14 +4056,14 @@ function mmLoop(ts){ if(!MM.el||!MM.el.isConnected){ MM.raf=0; return; } const d
     for(const p of D.players){ const el=MM.pc[p.id]; if(!el) continue; let x, y;
       if(MM.mode==='one'){ const m=document.getElementById('pc'+p.id); const tr=m&&m.getAttribute('transform'); const k=tr&&tr.match(/translate\(([-\d.]+),([-\d.]+)\)/); if(k){ x=+k[1]; y=+k[2]; } else { const q=pcPos(D,p); x=q.x; y=q.y; } }
       else { const a=MM.an[p.id]; const tgt=p.pos;
-        if(a.u>=1&&a.t!==tgt){ const f=(tgt-a.t+BOARD_N)%BOARD_N; const b=BOARD_N-f; if(Math.min(f,b)>25){ a.t=tgt; } else { const dir=f<=b?1:-1; a.from=a.t; a.to=(a.t+dir+BOARD_N)%BOARD_N; a.u=0; } }
-        if(a.u<1){ a.u=Math.min(1,a.u+dt/150); const A=TILES[a.from], B=TILES[a.to]; x=A.x+(B.x-A.x)*a.u; y=A.y+(B.y-A.y)*a.u-Math.sin(Math.PI*a.u)*16; if(a.u>=1) a.t=a.to; }
+        if(a.u>=1&&a.t!==tgt){ const f=(tgt-a.t+BOARD_N)%BOARD_N; const b=BOARD_N-f; if(Math.min(f,b)>10){ a.t=tgt; } else { const dir=f<=b?1:-1; a.from=a.t; a.to=(a.t+dir+BOARD_N)%BOARD_N; a.u=0; } }
+        if(a.u<1){ a.u=Math.min(1,a.u+dt/150); const A=TILES[a.from], B=TILES[a.to]; x=A.x+(B.x-A.x)*a.u; y=A.y+(B.y-A.y)*a.u-Math.sin(Math.PI*a.u)*34; if(a.u>=1) a.t=a.to; }
         else { const q=pcPos(D,p); x=q.x; y=q.y; } }
       el.setAttribute('transform',`translate(${x.toFixed(1)},${y.toFixed(1)})`); if(p.id===s.me.id){ mx=x; my=y; } }
     { const meA=MM.an[s.me.id]; const pos=MM.mode==='cl'&&meA?(meA.u<1?meA.to:meA.t):D.players[s.me.id].pos; const ty=TT[pos]; const inf=TILE_INFO[ty]||{};
       const lab=ty==='start'?'🏁 출발점':ty==='plain'?`⭐ ${pos}번 칸 · 일반칸`:`${inf.ic||'✨'} ${pos}번 칸 · ${inf.nm||''}`;
       if(MM.lab!==lab){ MM.lab=lab; const t=MM.el.querySelector('.mm-tile'); if(t){ t.textContent=lab; t.className='mm-tile '+(ty==='plain'?'':'ev'); t.style.animation='none'; void t.offsetWidth; t.style.animation=''; } } }
-    if(mx!=null){ const W=MM.el.clientWidth||200, H=MM.el.clientHeight||200; const vw=Math.max(94,125*W/H), vh=vw*H/W; const tx=mx, ty=my-19;
+    if(mx!=null){ const W=MM.el.clientWidth||200, H=MM.el.clientHeight||200; const vw=Math.max(165,165*W/H), vh=vw*H/W; const tx=mx, ty=my-4;
       if(MM.cx==null){ MM.cx=tx; MM.cy=ty; } MM.cx+=(tx-MM.cx)*0.14; MM.cy+=(ty-MM.cy)*0.14;
       MM.svg.setAttribute('viewBox',`${(MM.cx-vw/2).toFixed(1)} ${(MM.cy-vh/2).toFixed(1)} ${vw} ${vh.toFixed(1)}`); } }
   MM.raf=requestAnimationFrame(mmLoop); }
@@ -4085,7 +4085,7 @@ async function playBatch(ev){ const hasMA=ev.some(e=>e.e==='moveall');
 function applyEv(D,e){ const P=(e.p!=null&&e.p>=0)?D.players[e.p]:null;
   switch(e.e){
     case 'stun': D.rolls[e.p]={d:[],f:0,fs:[],b:0,c:0,st:1}; break;
-    case 'roll': D.rolls[e.p]={d:e.d,f:e.f,fs:e.fs,b:e.b,c:e.c}; if(e.b&&P){ P.sk=0; P.skl=0; } break;
+    case 'roll': D.rolls[e.p]={d:e.d,f:e.f,fs:e.fs,b:e.b,c:e.c}; break;
     case 'moveall': e.m.forEach(m=>{ D.players[m.p].pos=(m.from+m.n)%BOARD_N; }); break;
     case 'lap': Object.assign(P,{lv:e.lv,sk:e.sk,skl:e.skl,tk:e.tk,mhp:e.mhp,lap:e.lap}); P.hp=Math.min(P.mhp,P.hp+(e.h||0)); if(e.bp!=null) P.bp=e.bp; break;
     case 'order': D.order=e.o.slice(); D.ph='res'; D.ci=-1; break;
@@ -4095,7 +4095,7 @@ function applyEv(D,e){ const P=(e.p!=null&&e.p>=0)?D.players[e.p]:null;
     case 'tile': if(e.ty==='heal'||(e.ty==='card'&&(e.k==='heal'||e.k==='guard'))||(e.ty==='treasure'&&e.tr==='heal')) P.hp=Math.min(P.mhp,P.hp+(e.v||0));
       else if(e.ty==='trap'||e.ty==='hurt'||(e.ty==='card'&&e.k==='hit')) P.hp=Math.max(1,P.hp-(e.v||0));
       else if(e.ty==='treasure'&&e.tr==='skill'){ P.sk=1; P.skl=0; } else if(e.ty==='treasure'&&e.tr==='token') P.tk++; break;
-    case 'skill': if(P) P.sk=0; break;
+    case 'skill': if(P) P.sk=Math.max(0,P.sk-1); break;
     case 'atk': e.t.forEach(t=>{ const T=D.players[t.p]; if(t.r==='H'){ T.hp=t.h; if(t.x){ T.al=0; if(!D.out.includes(t.p)) D.out.push(t.p); } } else T.tk=Math.max(0,T.tk-1); }); break;
     case 'alloc': P.ab+=e.a; P.db+=e.d; P.dx+=e.x; P.bp=e.bp; break;
     case 'win': D.st='end'; D.win=e.p; D.ph='end'; break;
@@ -4193,7 +4193,7 @@ function pieceArt(cid){ const PH=PHOTO[cid]; if(!PH) return `<g transform="scale
 function pieceSVG(p){ return `<g class="pc" id="pc${p.id}"><ellipse cx="0" cy="3" rx="21" ry="8" fill="#000" opacity=".18"/><ellipse cx="0" cy="0" rx="19" ry="7" fill="${pcol(p.id)}" stroke="#4A3428" stroke-width="3"/>${pieceArt(p.cid)}<g transform="translate(-17,-66)"><rect width="34" height="8" rx="4" fill="#4A3428"/><rect class="pc-hpf" x="1.6" y="1.6" width="30.8" height="4.8" rx="2.4" fill="#3CCFB4"/></g><g transform="translate(0,-80)"><g class="pc-cur"><g class="pc-arr"><path d="M-8,-7 L8,-7 L0,4 Z" fill="#FFC93C" stroke="#4A3428" stroke-width="2.6" stroke-linejoin="round"/></g></g></g></g>`; }
 function setPc(el,x,y,lift){ el._x=x; el._y=y; el.setAttribute('transform',`translate(${x.toFixed(1)},${(y-(lift||0)).toFixed(1)})`); }
 function pcPos(D,p){ const t=TILES[p.pos]; const same=D.players.filter(q=>q.al&&q.pos===p.pos); const n=same.length, k=same.findIndex(q=>q.id===p.id);
-  if(n<=1||k<0) return {x:t.x,y:t.y}; const a=-Math.PI/2+k/n*Math.PI*2, r=14+n*3; return {x:t.x+Math.cos(a)*r, y:t.y+Math.sin(a)*r*0.55}; }
+  if(n<=1||k<0) return {x:t.x,y:t.y}; const a=-Math.PI/2+k/n*Math.PI*2, r=20+n*6; return {x:t.x+Math.cos(a)*r, y:t.y+Math.sin(a)*r*0.55}; }
 function renderPieces(D){ const g=$('#pieces'); if(!g||!D) return;
   for(const p of D.players){ let el=$('#pc'+p.id); if(!el){ g.insertAdjacentHTML('beforeend',pieceSVG(p)); el=$('#pc'+p.id); }
     el.style.display=p.al?'':'none'; if(!el._mv){ const q=pcPos(D,p); setPc(el,q.x,q.y); } updPcHP(p.id); updEmo(D,p,el); updMine(p,el); }
