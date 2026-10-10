@@ -409,6 +409,10 @@ input{font:inherit;color:var(--text);-webkit-user-select:text;user-select:text}
 .t-swap .ts-char{animation:charjump .75s .25s both,spinme .8s 1s}
 @keyframes spinme{to{transform:rotate(360deg)}}
 .title-card{position:relative}.tmute{position:absolute;right:10px;top:10px;z-index:3}
+.difs{display:flex;flex-direction:column;gap:6px}
+.seg.dif{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:7px 10px;border-radius:14px}.seg.dif b{font-size:15px}.seg.dif small{font-size:11.5px;opacity:.85;margin-top:2px}
+.seg.dif.d1.on{background:#C8F7D4}.seg.dif.d2.on{background:#DDF6FF}.seg.dif.d3.on{background:#FFF1B8}.seg.dif.d4.on{background:#FFD9C2}.seg.dif.d5.on{background:#3A2140;color:#FFD6F5}
+.dfb{font-style:normal;font-size:12px;border:2px solid var(--line);border-radius:10px;padding:0 6px;background:#fff;color:var(--ink)}.dfb.d1{background:#C8F7D4}.dfb.d2{background:#DDF6FF}.dfb.d3{background:#FFF1B8}.dfb.d4{background:#FFD9C2}.dfb.d5{background:#3A2140;color:#FFD6F5}
 </style>
 </head>
 <body>
@@ -3239,6 +3243,11 @@ function buildMapSVG(){ let tiles=''; const S=TILE_SZ, h=S/2;
   return `<defs>${defs}</defs><rect x="-1400" y="-1400" width="${MAP_W+2800}" height="${MAP_H+2800}" fill="#5A3B24"/><image href="${MAPIMG}" x="0" y="0" width="${MAP_W}" height="${MAP_H}" preserveAspectRatio="none"/><g>${tiles}</g><g id="pieces"></g><g id="fxmap"></g>`;
 }
 // ===================== ENGINE v2 : 동시 굴리기 라운드 =====================
+// 1인용 난이도 (내 캐릭터에만 적용): dm=해로운 칸 피해 배수, bm=이로운 칸 효과 배수, rev=부활 횟수
+const DIFF={1:{nm:'매우 쉬움',ic:'🐣',dm:0.5,bm:1.5,rev:1},2:{nm:'쉬움',ic:'🙂',dm:0.5,bm:1.5,rev:0},3:{nm:'보통',ic:'⚔️',dm:0.7,bm:1.3,rev:0},4:{nm:'어려움',ic:'🔥',dm:1,bm:1,rev:0},5:{nm:'헬모드',ic:'💀',dm:1.3,bm:0.7,rev:0}};
+const DM=p=>(DIFF[p&&p.df]||DIFF[4]).dm, BM=p=>(DIFF[p&&p.df]||DIFF[4]).bm;
+function ko(s,t){ if(t.hp>0) return 0; if((t.rev||0)>0){ t.rev--; t.hp=Math.max(1,Math.round(t.mhp*0.5)); (s.rvq=s.rvq||[]).push(t.id); return 0; } t.al=0; s.out.push(t.id); return 1; }
+function rvFlush(s,ev){ if(s.rvq&&s.rvq.length){ s.rvq.forEach(id=>{ const P=s.players[id]; ev.push({e:'revive',p:id,h:P.hp,rev:P.rev}); }); s.rvq=[]; } }
 // 라운드 = ① 모두 주사위 굴리기(순서 없음) → ② 모두 동시에 이동 → ③ 맨 앞 플레이어부터 특수상황(콤보·칸 이벤트·공격·스킬)
 // state는 JSON 직렬화 가능 (여러 기기 동기화용)
 const RNG = {
@@ -3281,7 +3290,7 @@ function newGame(roster, set){
   const players = roster.map((r,i)=>{ const c=CHARS[r.cid];
     const bb=(benTable(roster.length)[r.cid])||[1,0,1];
     return {id:i, name:r.name, cid:r.cid, own:r.own||'local', pos:0, lap:0, lv:1, hp:Math.round(set.hp*bb[0]), mhp:Math.round(set.hp*bb[0]), ba:Math.max(1,Math.round(c.atk0*bb[2])), bd:Math.max(1,Math.round(c.def0*bb[2])),
-      sk:c.skill?1:0, skl:0, tk:c.token?c.token.st:0, al:1, pv:0, bp:0, ab:0, db:0, dx:0, stun:0}; });
+      sk:c.skill?1:0, skl:0, tk:c.token?c.token.st:0, al:1, pv:0, bp:0, ab:0, db:0, dx:0, stun:0, df:r.df||0, rev:(r.df&&DIFF[r.df])?DIFF[r.df].rev:0}; });
   return {v:2, st:'play', set:{hp:set.hp, range:set.range, sd:set.sd==null?30:set.sd}, players, round:1,
     ph:'roll', rolls:{}, order:[], ci:-1, sub:null, pd:null, fl:{att:0,sk:0}, win:-1, out:[], seq:0};
 }
@@ -3420,7 +3429,7 @@ function moveBy(s,p,n,ev,k){
 function lapDone(s,p,ev,queued){
   const c=CHARS[p.cid]; p.lap++;
   let up=0, g=0; if(p.lv<MAX_LV){ p.lv++; p.mhp+=AMT(s,'hpGrow'); g=RULES.bonus+(c.weak?RULES.bonusWeak:0)+(c.xb||0); p.bp+=g; up=1; }
-  const h=Math.min(Math.round(p.mhp*RULES.lapHeal), p.mhp-p.hp); p.hp+=h;
+  const h=Math.min(Math.round(p.mhp*RULES.lapHeal*BM(p)), p.mhp-p.hp); p.hp+=h;
   if(c.skill&&up){ if(c.skill.t==='shark6'){ p.skl++; if(p.skl>=2){ p.sk=Math.min(9,p.sk+1); p.skl=0; } } else p.sk=Math.min(9,p.sk+1); }
   if(c.token){ p.tk=Math.min(c.token.mx, p.tk+c.token.inc); }
   ev.push({e:'lap',p:p.id,lv:p.lv,up,h,g,bp:p.bp,sk:p.sk,skl:p.skl,tk:p.tk,mhp:p.mhp,lap:p.lap});
@@ -3432,8 +3441,8 @@ function passive(s,p,ev){ const c=CHARS[p.cid]; const o=G.opps(s,p);
 function landOn(s,p,ev,depth){
   if(s.st!=='play'||!p.al) return; depth=depth||0;
   const ty=TT[p.pos];
-  if(ty==='heal'){ const v=Math.min(AMT(s,'heal'),p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,v}); }
-  else if(ty==='hurt'){ const v=Math.max(0,Math.min(Math.round(AMT(s,'hurt')*G.sdMul(s)),p.hp-1)); p.hp-=v; ev.push({e:'tile',p:p.id,ty,v}); }
+  if(ty==='heal'){ const v=Math.min(Math.round(AMT(s,'heal')*BM(p)),p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,v}); }
+  else if(ty==='hurt'){ const v=Math.max(0,Math.min(Math.round(AMT(s,'hurt')*G.sdMul(s)*DM(p)),p.hp-1)); p.hp-=v; ev.push({e:'tile',p:p.id,ty,v}); }
   else if(ty==='stop'){ p.stun=1; ev.push({e:'tile',p:p.id,ty}); }
   else if(ty==='atkR'||ty==='duelR'){ const o=G.opps(s,p); ev.push({e:'tile',p:p.id,ty}); if(o.length) tileHit(s,p,RNG.pick(o),ty==='atkR'?'atk':'duel',ev); }
   else if(ty==='atkC'||ty==='duelC'){ const o=G.opps(s,p); const mode=ty==='atkC'?'atk':'duel'; ev.push({e:'tile',p:p.id,ty});
@@ -3441,22 +3450,22 @@ function landOn(s,p,ev,depth){
   else if(ty==='fwd'||ty==='back'){ p.emo=s.round*10+(ty==='fwd'?1:2); const d=G.dice(p); const r=d.fs.map(q=>RNG.d(q)); ev.push({e:'tile',p:p.id,ty}); ev.push({e:'xroll',p:p.id,d:r,f:d.f,fs:d.fs,x:1,why:ty});
     let n=sumArr(r); if(ty==='fwd') moveBy(s,p,n,ev,'dash'); else { n=Math.min(n,p.pos); if(n>0){ const from=p.pos; p.pos-=n; ev.push({e:'move',p:p.id,from,n:-n,k:'back'}); } }
     if(depth<1&&s.st==='play') return landOn(s,p,ev,depth+1); }
-  else if(ty==='lucky'){ p.bp+=10; ev.push({e:'tile',p:p.id,ty,v:10}); }
+  else if(ty==='lucky'){ const lv=Math.round(10*BM(p)); p.bp+=lv; ev.push({e:'tile',p:p.id,ty,v:lv}); }
   else if(ty==='chest'){ const c=CHARS[p.cid]; const ops=['heal']; if(c.skill) ops.push('skill'); if(c.token&&p.tk<c.token.mx) ops.push('token'); const k=RNG.pick(ops);
-    if(k==='skill'){ p.sk=Math.min(9,p.sk+1); ev.push({e:'tile',p:p.id,ty,k}); } else if(k==='token'){ p.tk++; ev.push({e:'tile',p:p.id,ty,k,tt:c.token.k}); } else { const v=Math.min(Math.round(p.mhp*0.1),p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,k,v}); } }
+    if(k==='skill'){ p.sk=Math.min(9,p.sk+1); ev.push({e:'tile',p:p.id,ty,k}); } else if(k==='token'){ p.tk++; ev.push({e:'tile',p:p.id,ty,k,tt:c.token.k}); } else { const v=Math.min(Math.round(p.mhp*0.1*BM(p)),p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,k,v}); } }
   else if(ty==='storm'){ const tg=G.opps(s,p).filter(t=>G.dist(p.pos,t.pos)<=3); ev.push({e:'tile',p:p.id,ty,n:tg.length}); if(tg.length) strike(s,p,tg,G.atk(p)*2,'tile','번개 구름','공격력×2',ev); }
   else if(ty==='swap'){ const o=G.opps(s,p); if(o.length){ const t=RNG.pick(o); const a1=p.pos, b1=t.pos; ev.push({e:'tile',p:p.id,ty,by:t.id}); if(a1!==b1){ p.pos=b1; t.pos=a1; ev.push({e:'move',p:p.id,from:a1,n:(b1-a1+BOARD_N)%BOARD_N,k:'warp'}); ev.push({e:'move',p:t.id,from:b1,n:(a1-b1+BOARD_N)%BOARD_N,k:'warp'}); } } else ev.push({e:'tile',p:p.id,ty}); }
-  else if(ty==='party'){ const all=[]; for(const q of G.alive(s)){ const v=Math.min(Math.round(q.mhp*(q.id===p.id?0.1:0.05)),q.mhp-q.hp); q.hp+=v; all.push([q.id,v]); } ev.push({e:'tile',p:p.id,ty,all}); }
+  else if(ty==='party'){ const all=[]; for(const q of G.alive(s)){ const v=Math.min(Math.round(q.mhp*(q.id===p.id?0.1:0.05)*BM(q)),q.mhp-q.hp); q.hp+=v; all.push([q.id,v]); } ev.push({e:'tile',p:p.id,ty,all}); }
   else if(ty==='card'){
     const k=RNG.pick(['heal','hit','ambush','guard','blast']);
     const n=RULES.cardMin+10*Math.floor(Math.random()*((RULES.cardMax-RULES.cardMin)/10+1));
-    if(k==='heal'){ const v=Math.min(n,p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,k,v,n}); }
-    else if(k==='hit'){ const v=Math.max(0,Math.min(n,p.hp-1)); p.hp-=v; ev.push({e:'tile',p:p.id,ty,k,v,n}); }
+    if(k==='heal'){ const nn=Math.round(n*BM(p)); const v=Math.min(nn,p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,k,v,n:nn}); }
+    else if(k==='hit'){ const nn=Math.round(n*DM(p)); const v=Math.max(0,Math.min(nn,p.hp-1)); p.hp-=v; ev.push({e:'tile',p:p.id,ty,k,v,n:nn}); }
     else if(k==='ambush'){ const o=G.opps(s,p); if(!o.length) return; const A=RNG.pick(o); const d=G.dice(A); const r=RNG.d(d.f);
       ev.push({e:'tile',p:p.id,ty,k,by:A.id}); ev.push({e:'xroll',p:A.id,d:[r],f:d.f,x:1,why:'atk'});
       strike(s,A,[p],r*G.atk(A),'tile','기습당함! (방어력 무시)',r+'×공격력',ev,{nodef:1,keep1:1}); }
-    else if(k==='guard'){ const d=G.dice(p); const r=d.fs.map(q=>RNG.d(q)); const sm=sumArr(r), df=G.def(p); const v=Math.min(df*sm,p.mhp-p.hp); p.hp+=v;
-      ev.push({e:'xroll',p:p.id,d:r,f:d.f,fs:d.fs,x:1,why:'heal'}); ev.push({e:'tile',p:p.id,ty,k,v,n:df*sm,df,sm}); }
+    else if(k==='guard'){ const d=G.dice(p); const r=d.fs.map(q=>RNG.d(q)); const sm=sumArr(r), df=G.def(p); const v=Math.min(Math.round(df*sm*BM(p)),p.mhp-p.hp); p.hp+=v;
+      ev.push({e:'xroll',p:p.id,d:r,f:d.f,fs:d.fs,x:1,why:'heal'}); ev.push({e:'tile',p:p.id,ty,k,v,n:Math.round(df*sm*BM(p)),df,sm}); }
     else { const o=G.opps(s,p); ev.push({e:'tile',p:p.id,ty,k}); if(o.length) strike(s,p,o,G.atk(p)*3,'tile','대폭발! (방어력 무시)','공격력×3',ev,{nodef:1,keep1:1}); }
   }
 }
@@ -3484,19 +3493,19 @@ function treasure(s,p,ev,depth){
 
 function strike(s,att,tgts,raw,kind,lb,m,ev,o){
   o=o||{}; const res=[]; const mul=G.sdMul(s);
-  for(const t of tgts){ if(!t.al) continue; const tc=CHARS[t.cid];
-    if(!o.nodef&&tc.token&&t.tk>0){ (s.gq=s.gq||[]).push({a:att.id,t:t.id,d:G.dmg(raw*mul,t),k:kind,lb,m,raw:Math.round(raw),sd:mul}); continue; }
-    let dmg=o.nodef?Math.max(1,Math.round(raw*mul)):G.dmg(raw*mul,t); if(o.keep1) dmg=Math.max(0,Math.min(dmg,t.hp-1));
-    t.hp=Math.max(0,t.hp-dmg); const x=t.hp<=0?1:0; if(x){ t.al=0; s.out.push(t.id); }
-    res.push({p:t.id,d:dmg,r:'H',h:t.hp,x});
+  for(const t of tgts){ if(!t.al) continue; const tc=CHARS[t.cid]; const tf=(kind==='tile'||kind==='duel')?DM(t)*BM(att):1;
+    if(!o.nodef&&tc.token&&t.tk>0){ (s.gq=s.gq||[]).push({a:att.id,t:t.id,d:Math.max(1,Math.round(G.dmg(raw*mul,t)*tf)),k:kind,lb,m,raw:Math.round(raw),sd:mul}); continue; }
+    let dmg=o.nodef?Math.max(1,Math.round(raw*mul)):G.dmg(raw*mul,t); dmg=Math.max(1,Math.round(dmg*tf)); if(o.keep1) dmg=Math.max(0,Math.min(dmg,t.hp-1));
+    t.hp=Math.max(0,t.hp-dmg); const hh=t.hp; const x=ko(s,t);
+    res.push({p:t.id,d:dmg,r:'H',h:hh,x});
   }
   if(res.length) ev.push({e:'atk',p:att.id,k:kind,lb,m,raw:Math.round(raw),sd:mul,t:res});
-  checkWin(s,ev);
+  rvFlush(s,ev); checkWin(s,ev);
 }
 function resolveGuard(s,g,use,ev){ const T=s.players[g.t], A=s.players[g.a]; if(!T||!T.al) return; const tc=CHARS[T.cid];
   if(use&&T.tk>0){ T.tk--; ev.push({e:'atk',p:A.id,k:g.k,lb:g.lb,m:g.m,raw:g.raw,sd:g.sd,t:[{p:T.id,d:0,r:tc.token.k==='block'?'B':'E',h:T.hp,x:0}]}); return; }
-  T.hp=Math.max(0,T.hp-g.d); const x=T.hp<=0?1:0; if(x){ T.al=0; s.out.push(T.id); }
-  ev.push({e:'atk',p:A.id,k:g.k,lb:g.lb,m:g.m,raw:g.raw,sd:g.sd,t:[{p:T.id,d:g.d,r:'H',h:T.hp,x}]}); checkWin(s,ev); }
+  T.hp=Math.max(0,T.hp-g.d); const hh=T.hp; const x=ko(s,T);
+  ev.push({e:'atk',p:A.id,k:g.k,lb:g.lb,m:g.m,raw:g.raw,sd:g.sd,t:[{p:T.id,d:g.d,r:'H',h:hh,x}]}); rvFlush(s,ev); checkWin(s,ev); }
 function doCombo(s,p,ev){ const c=CHARS[p.cid].combo; s.fl.cb=0; s.fl.cmv=c.fx.some(f=>f[0]==='move'||f[0]==='step')?1:0; ev.push({e:'combo',p:p.id,nm:c.nm}); const r=runFx(s,p,ev,0); if(s.st!=='play') return; comboAfter(s,p,ev,r); }
 function comboAfter(s,p,ev,r){ if(r==='wait'){ s.sub='choose'; return; } if(!p.al){ nextStep(s,ev); return; } if(s.fl.cmv){ s.fl.cmv=0; afterFx(s,p,ev); } else { s.sub='act'; autoStep(s,ev); } }
 
@@ -3731,7 +3740,7 @@ function titleHTML(){ const sv=store.get('ank2-save',null); const can=!!(sv&&sv.
   <button class="btn candy wide" data-act="goJoin">🙋 폰으로 참가하기</button>
   ${can?`<button class="btn grape wide" data-act="resume">▶ 이어하기 (라운드 ${sv.S.round})</button>`:''}
   <div class="row2"><button class="btn ghost" data-act="rules">📖 게임 방법</button><button class="btn ghost" data-act="dex">🐾 캐릭터 도감</button></div></div>
-  <div class="foot">🏷️ 버전 11.00 · 오케스트라 & 컴퓨터 플레이어<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
+  <div class="foot">🏷️ 버전 12.00 · 1인용 난이도 5단계<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
 function updTitleBan(){ const b=$('#tban'); if(!b) return; const hs=NET.hosts||[];
   b.innerHTML=hs.length?`<div class="hostban">🎮 방 <b>${esc(hs[0])}</b>에서 플레이어를 모으고 있어요!<br><button class="btn sm sun" data-act="jRoom" data-c="${esc(hs[0])}" style="margin-top:6px">🙋 이 방에 참가하기</button></div>`:''; }
 
@@ -3786,7 +3795,7 @@ function menuHTML(){ const hostish=APP.role!=='client';
 
 // ---------- 게임 시작 · 저장 ----------
 function startGame(){ if(APP.role==='one'&&!oneBuildRoster()) return; if(APP.roster.length<2) return;
-  APP.S=newGame(APP.roster.map(r=>({name:r.name,cid:r.cid,own:r.own})), Object.assign({},APP.set));
+  APP.S=newGame(APP.roster.map(r=>({name:r.name,cid:r.cid,own:r.own,df:APP.role==='one'?(r.df||0):0})), Object.assign({},APP.set));
   APP.logs=[]; APP.ui=null; APP.sharkSel={}; ANIM.q=[]; ANIM.busy=false; saveGame(); go('game'); log('⚔️ 게임 시작! 모두 주사위를 굴려 주세요'); hostPublish(true); }
 function saveGame(){ if(!APP.S||APP.role==='client') return; store.set('ank2-save',{S:APP.S,role:APP.role,code:APP.code,seen:HOST.seen,ack:HOST.ack,logs:APP.logs.slice(-30)}); }
 function resumeGame(){ const sv=store.get('ank2-save',null); if(!sv||!sv.S||sv.S.v!==2) return;
@@ -3879,8 +3888,9 @@ function joinHTML(){ const mode=netMode(); const h=CL.hp; let body='';
   return `<div class="scr join"><div class="bar"><button class="ib" data-act="home" aria-label="뒤로">←</button><h2>🙋 폰으로 참가하기</h2></div><div class="join-b scroll">${body}</div></div>`; }
 function heroHTML(g,me){ const c=CHARS[me.cid];
   const em=(me.emo&&Math.floor(me.emo/10)===g.round)?(me.emo%10===1?'<div class="emo e-joy">😆<small>신나요!</small></div>':'<div class="emo e-sad">😭<small>흑흑…</small></div>'):'';
-  const tk=c.token?`<span>${c.token.k==='block'?'🛡️ 막기':'💨 회피'} <b>${me.tk}</b></span>`:''; const sk=c.skill?`<span>✨ 스킬 <b>${me.sk>=1?me.sk+'개':'충전 중'}</b></span>`:'';
-  return `<div class="hero"><div class="hero-art"><div class="ha-in">${charSVG(me.cid,'full')}</div>${em}</div><div class="hero-i"><div class="hero-n"><b>${esc(me.name)}</b><em>Lv ${me.lv}</em>${me.bp>0?`<em class="bp">⭐ ${me.bp}점</em>`:''}</div>
+  const dfb=me.df&&DIFF[me.df]?`<em class="dfb d${me.df}">${DIFF[me.df].ic} ${DIFF[me.df].nm}</em>`:''; const rvb=me.df===1?`<span>💖 부활 <b>${me.rev||0}번</b></span>`:'';
+  const tk=(c.token?`<span>${c.token.k==='block'?'🛡️ 막기':'💨 회피'} <b>${me.tk}</b></span>`:'')+rvb; const sk=c.skill?`<span>✨ 스킬 <b>${me.sk>=1?me.sk+'개':'충전 중'}</b></span>`:'';
+  return `<div class="hero"><div class="hero-art"><div class="ha-in">${charSVG(me.cid,'full')}</div>${em}</div><div class="hero-i"><div class="hero-n"><b>${esc(me.name)}</b><em>Lv ${me.lv}</em>${dfb}${me.bp>0?`<em class="bp">⭐ ${me.bp}점</em>`:''}</div>
   <div class="hp big ${hpCls(me)}"><i style="width:${Math.max(0,me.hp/me.mhp*100)}%"></i><span>❤️ ${fmt(me.hp)} / ${fmt(me.mhp)}</span></div>
   <div class="stg"><span>⚔️ 공격 <b>${G.atk(me)}</b></span><span>🛡️ 방어 <b>${G.def(me)}</b></span><span class="w">🎲 주사위 <b>${diceLbl(me)}</b></span>${tk}${sk}</div></div></div>`; }
 function othersHTML(g,me){ const ps=g.players.filter(p=>p.id!==me.id).sort((a,b)=>(b.al-a.al)||(b.hp-a.hp));
@@ -3995,6 +4005,7 @@ const ACT={
 // ===================== 1인용 모드 · 컴퓨터 상대 · 우승 장면 · 스크린샷 =====================
 const ONE={sub:'quick'};
 function meP(S){ return S?S.players.find(p=>p.own==='host'):null; }
+const DIFF_DS={1:'💖 쓰러져도 1번 부활 · 해로운 칸 피해 -50% · 이로운 칸 효과 +50%',2:'해로운 칸 피해 -50% · 이로운 칸 효과 +50%',3:'해로운 칸 피해 -30% · 이로운 칸 효과 +30%',4:'지금 그대로 (보정 없음)',5:'해로운 칸 피해 +30% · 이로운 칸 효과 -30%'};
 function oneLobbyHTML(){ const q=ONE.sub==='quick'; const o=+APP.set.opp||3;
   const seg=v=>`<button class="seg ${o===v?'on':''}" data-act="setOpt" data-k="opp" data-v="${v}">${v}명</button>`;
   return `<div class="scr lobby"><div class="bar"><button class="ib" data-act="home" aria-label="뒤로">←</button><h2>${q?'⚡ 나만 골라 도전':'🏆 드림 매치'}</h2></div>
@@ -4002,6 +4013,7 @@ function oneLobbyHTML(){ const q=ONE.sub==='quick'; const o=+APP.set.opp||3;
   <section class="card"><div class="sec-h"><b>${q?'👤 내 캐릭터':'🐾 참가 기사'}</b><span id="rcount"></span></div><div id="roster"></div>
   <div class="row2">${q?`<button class="btn sun" data-act="addLocal">🐾 내 캐릭터 고르기</button>`:`<button class="btn sun" data-act="addLocal">＋ 캐릭터 고르기</button><button class="btn ghost" data-act="addRandom">🎲 랜덤 추가</button>`}</div>
   <p class="note">${q?'상대 기사들은 컴퓨터가 무작위로 골라서 조종해요.':'처음 고른 캐릭터가 <b>나</b>예요. 나머지는 컴퓨터가 조종해요 (최대 8명).'}</p></section>
+  <section class="card"><div class="sec-h"><b>🎚️ 난이도</b><span>내 캐릭터에만 적용</span></div><div class="difs">${[1,2,3,4,5].map(v=>`<button class="seg dif d${v} ${(+APP.set.diff||3)===v?'on':''}" data-act="setOpt" data-k="diff" data-v="${v}"><b>${DIFF[v].ic} ${v}단계 · ${DIFF[v].nm}</b><small>${DIFF_DS[v]}</small></button>`).join('')}</div></section>
   ${q?`<section class="card"><div class="sec-h"><b>🤖 상대 수</b></div><div class="segs">${[1,2,3,4,5,6,7].map(seg).join('')}</div></section>`:''}
   <section class="card"><div class="sec-h"><b>⚙️ 게임 설정</b></div>${settingsHTML()}</section></div>
   <div class="lobby-foot"><button class="btn big candy wide" id="startBtn" data-act="startGame">⚔️ 게임 시작!</button></div></div>`; }
@@ -4016,7 +4028,7 @@ function onePick(cid,nm){ if(ONE.sub==='quick') APP.roster=[{name:nm,cid,own:'ho
 function oneRm(i){ APP.roster.splice(i,1); if(APP.roster.length&&!hasMe()) APP.roster[0].own='host'; oneRefresh(); }
 function oneAddRandom(){ if(ONE.sub==='quick') return; if(APP.roster.length>=8) return toast('최대 8명까지예요'); const tk=new Set(APP.roster.map(r=>r.cid)); const free=[]; for(let i=1;i<=20;i++) if(!tk.has(i)) free.push(i);
   const cid=free[Math.floor(Math.random()*free.length)]; APP.roster.push({name:CHARS[cid].name,cid,own:hasMe()?'ai':'host'}); oneRefresh(); }
-function oneBuildRoster(){ if(ONE.sub!=='quick') return APP.roster.length>=2&&hasMe(); if(APP.roster.length<1) return false;
+function oneBuildRoster(){ const dfv=+APP.set.diff||3; APP.roster.forEach(r=>{ r.df=r.own==='host'?dfv:0; }); if(ONE.sub!=='quick') return APP.roster.length>=2&&hasMe(); if(APP.roster.length<1) return false;
   const me=APP.roster.find(r=>r.own==='host')||APP.roster[0]; me.own='host'; const n=Math.max(1,Math.min(7,+APP.set.opp||3));
   const free=[]; for(let i=1;i<=20;i++) if(i!==me.cid) free.push(i); for(let i=free.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [free[i],free[j]]=[free[j],free[i]]; }
   APP.roster=[me,...free.slice(0,n).map(cid=>({name:CHARS[cid].name,cid,own:'ai'}))]; return true; }
@@ -4170,6 +4182,7 @@ function applyEv(D,e){ const P=(e.p!=null&&e.p>=0)?D.players[e.p]:null;
       else if(e.ty==='treasure'&&e.tr==='skill'){ P.sk=1; P.skl=0; } else if(e.ty==='treasure'&&e.tr==='token') P.tk++; break;
     case 'skill': if(P) P.sk=Math.max(0,P.sk-1); break;
     case 'atk': e.t.forEach(t=>{ const T=D.players[t.p]; if(t.r==='H'){ T.hp=t.h; if(t.x){ T.al=0; if(!D.out.includes(t.p)) D.out.push(t.p); } } else T.tk=Math.max(0,T.tk-1); }); break;
+    case 'revive': if(P){ P.hp=e.h; P.al=1; P.rev=e.rev; } break;
     case 'alloc': P.ab+=e.a; P.db+=e.d; P.dx+=e.x; P.bp=e.bp; break;
     case 'win': D.st='end'; D.win=e.p; D.ph='end'; break;
     case 'round': D.round=e.r; D.ph='roll'; D.rolls={}; D.order=[]; D.ci=-1; D.sub=null; break;
@@ -4195,6 +4208,7 @@ async function playEv(e,hasMA){ const D=ANIM.D; const P=(e.p!=null&&e.p>=0)?D.pl
     case 'alloc': { applyEv(D,e); renderChips(); sfx('pop'); const t=(e.a?`⚔️ 공격력 +${e.a} `:'')+(e.d?`🛡️ 방어력 +${e.d} `:'')+(e.x?'🎲 주사위 눈 +1':''); log(`⭐ ${P.name}: ${t}`); await banner('⭐ 능력치 UP!',`<span class="up-t">${t}</span>`,P,1150); break; }
     case 'win': applyEv(D,e); renderChips(); log(`🏆 ${P?P.name:'무승부'} 승리!`); await winFx(e); break;
     case 'round': applyEv(D,e); renderTop(); renderChips(); markCur(); log(`— 라운드 ${e.r} —`); break;
+    case 'revive': applyEv(D,e); renderChips(); renderPieces(D); updPcHP(e.p); sfx('lvl'); setTimeout(()=>sfx('heal'),350); floatTxt(e.p,'💖 부활!','heal'); log(`💖 ${P.name} 부활! 체력 ${fmt(e.h)}`); await banner('💖 부활!',`${nm} 다시 일어났어요!<br>체력 ${fmt(e.h)}으로 부활 (남은 부활 ${e.rev}번)`,P,1900); break;
     case 'sd': sfx('combo'); log('🔥 대혼전 시작!'); await banner('🔥 대혼전 시작!',`이제부터 모든 공격 피해가<br>매 라운드 +${Math.round(RULES.sdStep*100)}%씩 커져요`,null,1900); break;
   } }
 // ---------- 오버레이 ----------
