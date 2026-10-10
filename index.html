@@ -413,6 +413,28 @@ input{font:inherit;color:var(--text);-webkit-user-select:text;user-select:text}
 .seg.dif{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:7px 10px;border-radius:14px}.seg.dif b{font-size:15px}.seg.dif small{font-size:11.5px;opacity:.85;margin-top:2px}
 .seg.dif.d1.on{background:#C8F7D4}.seg.dif.d2.on{background:#DDF6FF}.seg.dif.d3.on{background:#FFF1B8}.seg.dif.d4.on{background:#FFD9C2}.seg.dif.d5.on{background:#3A2140;color:#FFD6F5}
 .dfb{font-style:normal;font-size:12px;border:2px solid var(--line);border-radius:10px;padding:0 6px;background:#fff;color:var(--ink)}.dfb.d1{background:#C8F7D4}.dfb.d2{background:#DDF6FF}.dfb.d3{background:#FFF1B8}.dfb.d4{background:#FFD9C2}.dfb.d5{background:#3A2140;color:#FFD6F5}
+.rpsov{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:radial-gradient(circle,#FFF4C2 0,#FFB347 45%,#7B3FA0 100%);animation:fade .2s}
+.rp-t{font-size:clamp(30px,8vw,60px);font-weight:900;color:#fff;-webkit-text-stroke:2px #4A3428;text-shadow:0 4px 0 #4A3428}
+.rp-st{display:flex;align-items:center;justify-content:center;gap:3vw;width:100%}
+.rp-c{position:relative;display:flex;flex-direction:column;align-items:center;width:min(38vw,300px)}
+.rp-c svg{width:100%;height:auto;filter:drop-shadow(0 8px 0 rgba(0,0,0,.2))}
+.rp-c.a svg{animation:rpa 1.2s ease-in-out infinite}.rp-c.b svg{transform:scaleX(-1);animation:rpb 1.2s ease-in-out infinite}
+@keyframes rpa{50%{transform:translateY(-8px) rotate(-3deg)}}@keyframes rpb{0%,100%{transform:scaleX(-1)}50%{transform:scaleX(-1) translateY(-8px) rotate(-3deg)}}
+.rp-c b{background:#fff;border:3px solid #4A3428;border-radius:12px;padding:1px 10px;margin-top:4px}
+.rp-h{position:absolute;top:6%;font-size:clamp(46px,12vw,96px);filter:drop-shadow(0 4px 0 rgba(0,0,0,.3))}.rp-c.a .rp-h{right:-8%}.rp-c.b .rp-h{left:-8%}
+.shk .rp-h{animation:rph .42s ease-in-out}@keyframes rph{0%{transform:translateY(0)}40%{transform:translateY(-36px) rotate(-14deg)}100%{transform:translateY(0)}}
+.rp-h.rev{animation:popin .45s cubic-bezier(.3,1.6,.5,1)}
+.rp-vs{font-size:clamp(28px,7vw,56px);font-weight:900;color:#FFE15A;-webkit-text-stroke:2px #4A3428}
+.rp-c.win{filter:drop-shadow(0 0 18px #FFF59A)}.rp-c.win svg{animation:winjump .5s ease-in-out 3}.rp-c.lose{filter:grayscale(.7)}.rp-c.lose svg{animation:redflash .3s 3}
+.rp-r{font-size:17px;text-align:center;background:#fff;border:3px solid #4A3428;border-radius:16px;padding:6px 14px;margin:0 10px}
+.rpsbox{width:100%;background:#FFF7E0;border:3px solid #FFB347;border-radius:18px;padding:8px 10px}
+.rps-b{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.rpsbtn{display:flex!important;flex-direction:column;align-items:center;padding:8px 2px!important;font-size:14px}.rpsbtn span{font-size:34px;line-height:1.15}
+.typh{position:absolute;inset:0;z-index:40;overflow:hidden;pointer-events:none;background:rgba(40,60,90,.38);animation:fade .2s}
+.ty-sw{position:absolute;left:50%;top:50%;width:160vmax;height:160vmax;margin:-80vmax 0 0 -80vmax;background:repeating-conic-gradient(rgba(255,255,255,.24) 0 12deg,transparent 12deg 30deg);border-radius:50%;animation:spinb 1.4s linear infinite;-webkit-mask:radial-gradient(circle,transparent 6%,#000 28%,transparent 70%);mask:radial-gradient(circle,transparent 6%,#000 28%,transparent 70%)}
+.tyl{position:absolute;left:-10%;font-style:normal;animation:tyl 1.2s linear infinite}@keyframes tyl{from{transform:translateX(0) rotate(0)}to{transform:translateX(130vw) rotate(720deg)}}
+.ty-t{position:absolute;left:0;right:0;top:30%;text-align:center;font-size:clamp(34px,9vw,70px);font-weight:900;color:#fff;-webkit-text-stroke:2px #24364F;text-shadow:0 5px 0 #24364F;animation:popin .6s cubic-bezier(.3,1.6,.5,1)}
+.ty-s{position:absolute;left:0;right:0;top:calc(30% + 90px);text-align:center;font-size:16px;color:#fff;text-shadow:0 2px 0 #24364F}
+.quake{animation:quake .22s linear infinite}@keyframes quake{25%{transform:translate(3px,-2px)}50%{transform:translate(-3px,2px)}75%{transform:translate(2px,3px)}}
 </style>
 </head>
 <body>
@@ -2839,7 +2861,7 @@ Object.assign(TILE_INFO,{
   atkC:{ic:'🎯',nm:'원하는 캐릭터 공격',ds:'지정한 상대 공격'},
   duelR:{ic:'⚔️',nm:'랜덤 타인과 대결',ds:'무작위 상대와 서로 한 대씩'},
   duelC:{ic:'⚔️',nm:'원하는 캐릭터와 대결',ds:'고른 상대와 서로 한 대씩'},
-  stop:{ic:'🚫',nm:'한 번 이동 불가',ds:'다음 라운드 한 번 움직이지 못함'},
+  stop:{ic:'🚫',nm:'한 번 이동 불가',ds:'다음 라운드 주사위: 가장 높은 눈(1개) 또는 모두 같은 눈(2~3개)이면 탈출!'},
   heal:{ic:'💚',nm:'치료칸',ds:'체력 회복'},
   hurt:{ic:'💥',nm:'공격당함',ds:'피해를 입는 칸'},
   card:{ic:'❓',nm:'랜덤칸 (치료/공격)',ds:'회복·기습·대폭발 등 5가지 중 하나'},
@@ -3290,8 +3312,9 @@ function newGame(roster, set){
   const players = roster.map((r,i)=>{ const c=CHARS[r.cid];
     const bb=(benTable(roster.length)[r.cid])||[1,0,1];
     return {id:i, name:r.name, cid:r.cid, own:r.own||'local', pos:0, lap:0, lv:1, hp:Math.round(set.hp*bb[0]), mhp:Math.round(set.hp*bb[0]), ba:Math.max(1,Math.round(c.atk0*bb[2])), bd:Math.max(1,Math.round(c.def0*bb[2])),
-      sk:c.skill?1:0, skl:0, tk:c.token?c.token.st:0, al:1, pv:0, bp:0, ab:0, db:0, dx:0, stun:0, df:r.df||0, rev:(r.df&&DIFF[r.df])?DIFF[r.df].rev:0}; });
-  return {v:2, st:'play', set:{hp:set.hp, range:set.range, sd:set.sd==null?30:set.sd}, players, round:1,
+      sk:c.skill?1:0, skl:0, tk:c.token?c.token.st:0, al:1, pv:0, bp:0, ab:0, db:0, dx:0, stun:0, emo:0, df:r.df||0, rev:(r.df&&DIFF[r.df])?DIFF[r.df].rev:0}; });
+  const R3=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+  return {v:2, typh:[R3(6,10),R3(15,20),R3(24,29)], met:{}, rq:[], rps:null, lastTy:0, st:'play', set:{hp:set.hp, range:set.range, sd:set.sd==null?30:set.sd}, players, round:1,
     ph:'roll', rolls:{}, order:[], ci:-1, sub:null, pd:null, fl:{att:0,sk:0}, win:-1, out:[], seq:0};
 }
 
@@ -3339,6 +3362,14 @@ function gameAct(s, a){
       if(!s.gq.length){ const gs=s.gs||{sub:'act',next:0}; s.gs=null; s.sub=gs.sub; const cur=G.cur(s);
         if(gs.next||!cur||!cur.al) nextStep(s,ev); else if(s.sub==='act') autoStep(s,ev); }
       break; }
+    case 'rps': { const R=s.rps; if(s.sub!=='rps'||!R||!P||!['r','p','s'].includes(a.c)) return bad();
+      if(P.id===R.a&&!R.ca) R.ca=a.c; else if(P.id===R.b&&!R.cb) R.cb=a.c; else return bad();
+      if(R.ca&&R.cb){ const w=rpsWin(R.ca,R.cb); ev.push({e:'rps',a:R.a,b:R.b,ca:R.ca,cb:R.cb,w,n:R.n});
+        if(w===0&&R.n<2){ R.n++; R.ca=R.cb=null; break; }
+        if(w!==0){ const W=s.players[w===1?R.a:R.b], L=s.players[w===1?R.b:R.a]; const d=Math.min(500,L.hp); L.hp-=d; const hh=L.hp; const x=ko(s,L);
+          ev.push({e:'atk',p:W.id,k:'rps',lb:'가위바위보 승리!',m:'방어력 무시 500',raw:500,sd:1,t:[{p:L.id,d,r:'H',h:hh,x}]}); rvFlush(s,ev); checkWin(s,ev); }
+        if(s.st==='play'){ const cur=G.cur(s); if(cur) nextMeet(s,cur,ev); } }
+      break; }
     case 'end': { if(!P||!G.isCur(s,P)||s.sub!=='act') return bad(); nextStep(s,ev); break; }
     default: return bad();
   }
@@ -3358,14 +3389,15 @@ function comboHit(c, vals){
 function doRoll(s,p,boost,ev){
   const d=G.dice(p); const fs=boost?d.fs.concat(d.fs):d.fs; const dice=fs.map(q=>RNG.d(q));
   if(boost){ p.sk=Math.max(0,p.sk-1); ev.push({e:'skill',p:p.id,nm:CHARS[p.cid].skill.nm}); }
-  const c=CHARS[p.cid].combo; const hit=!boost&&!!c&&comboHit(c,dice);
-  s.rolls[p.id]={d:dice,f:d.f,fs,b:boost?1:0,c:hit?1:0};
-  ev.push({e:'roll',p:p.id,d:dice,f:d.f,fs,b:boost?1:0,c:hit?1:0});
+  const c=CHARS[p.cid].combo; let hit=!boost&&!!c&&comboHit(c,dice); let st=0, esc=0;
+  if(p.stun){ p.stun=0; esc=(fs.length===1?dice[0]===fs[0]:dice.every(v=>v===dice[0]))?1:0; if(!esc){ st=1; hit=false; } }
+  s.rolls[p.id]={d:dice,f:d.f,fs,b:boost?1:0,c:hit?1:0,st,esc};
+  ev.push({e:'roll',p:p.id,d:dice,f:d.f,fs,b:boost?1:0,c:hit?1:0,st,esc});
 }
 
 function startRes(s,ev){
   s.ph='res'; const al=G.alive(s);
-  const mv=al.map(p=>{ const w=Math.random()<RULES.warp; return {p:p.id, from:p.pos, n:w?BOARD_N-p.pos:sumArr(s.rolls[p.id].d), w:w?1:0}; });
+  const mv=al.map(p=>{ const r=s.rolls[p.id]; const w=!r.st&&Math.random()<RULES.warp; return {p:p.id, from:p.pos, n:r.st?0:(w?BOARD_N-p.pos:sumArr(r.d)), w:w?1:0, st:r.st?1:0, esc:r.esc?1:0}; });
   ev.push({e:'moveall', m:mv});
   for(const m of mv){ const p=s.players[m.p]; const tot=p.pos+m.n; p.pos=tot%BOARD_N;
     for(let i=0;i<Math.floor(tot/BOARD_N);i++) lapDone(s,p,ev,true); }
@@ -3383,10 +3415,18 @@ function nextStep(s,ev){
     const p=s.players[s.order[s.ci]]; if(!p.al) continue;
     ev.push({e:'step', p:p.id, i:s.ci});
     const r=s.rolls[p.id]; s.fl.cb=(r&&r.c&&!r.st)?1:0;
-    afterFx(s,p,ev); return;
+    startMeet(s,p,ev); return;
   }
 }
 
+const mkey=(s,x,y)=>s.round+':'+Math.min(x,y)+'-'+Math.max(x,y);
+function startMeet(s,p,ev){ s.met=s.met||{}; s.rq=G.opps(s,p).filter(o=>o.pos===p.pos&&!s.met[mkey(s,p.id,o.id)]).map(o=>o.id); nextMeet(s,p,ev); }
+function nextMeet(s,p,ev){
+  while(s.rq&&s.rq.length){ const o=s.players[s.rq.shift()]; if(!o||!o.al||!p.al||o.pos!==p.pos) continue; s.met[mkey(s,p.id,o.id)]=1;
+    s.rps={a:p.id,b:o.id,ca:null,cb:null,n:0}; s.sub='rps'; ev.push({e:'meet',a:p.id,b:o.id}); return; }
+  s.rps=null; s.sub=null; if(s.st!=='play') return; if(p.al) afterFx(s,p,ev); else nextStep(s,ev); }
+function rpsWin(x,y){ return x===y?0:((x==='r'&&y==='s')||(x==='s'&&y==='p')||(x==='p'&&y==='r'))?1:-1; }
+function typhoon(s,ev){ const m=G.alive(s).map(p=>{ const from=p.pos; p.pos=Math.floor(Math.random()*BOARD_N); return [p.id,from,p.pos]; }); s.lastTy=s.round; ev.push({e:'typhoon',m}); }
 function afterFx(s,p,ev){ const r0=s.rolls[p.id]; const r=(r0&&r0.st)?null:landOn(s,p,ev,0); if(s.st!=='play') return; if(!p.al){ nextStep(s,ev); return; } if(r==='wait'){ s.sub='choose'; return; } s.sub='act'; autoStep(s,ev); }
 function autoStep(s,ev){ if(s.st!=='play'||s.ph!=='res'||s.sub!=='act') return; if(s.gq&&s.gq.length){ s.gs={sub:'act',next:0}; s.sub='guard'; return; } const p=G.cur(s); if(!p) return;
   if(G.canAttack(s,p)||G.canSkill(s,p)||G.canCombo(s,p)||G.canPassive(s,p)||(p.bp||0)>0) return; nextStep(s,ev); }
@@ -3395,7 +3435,8 @@ function endRound(s,ev){
   s.round++; s.ph='roll'; s.rolls={}; s.order=[]; s.ci=-1; s.sub=null; s.pd=null; s.fl={att:0,sk:0};
   ev.push({e:'round', r:s.round});
   if(s.set.sd>0&&s.round===s.set.sd) ev.push({e:'sd', r:s.round});
-  for(const p of G.alive(s)) if(p.stun){ p.stun=0; const d=G.dice(p); s.rolls[p.id]={d:[],f:d.f,fs:[],b:0,c:0,st:1}; ev.push({e:'stun',p:p.id}); }
+  s.met={}; if(s.typh&&s.typh.includes(s.round)&&s.lastTy!==s.round) typhoon(s,ev);
+  for(const p of G.alive(s)) if(p.stun) ev.push({e:'stun',p:p.id});
   if(s.st==='play'&&G.alive(s).length&&!G.needRoll(s).length) startRes(s,ev);
 }
 
@@ -3454,7 +3495,7 @@ function landOn(s,p,ev,depth){
   else if(ty==='chest'){ const c=CHARS[p.cid]; const ops=['heal']; if(c.skill) ops.push('skill'); if(c.token&&p.tk<c.token.mx) ops.push('token'); const k=RNG.pick(ops);
     if(k==='skill'){ p.sk=Math.min(9,p.sk+1); ev.push({e:'tile',p:p.id,ty,k}); } else if(k==='token'){ p.tk++; ev.push({e:'tile',p:p.id,ty,k,tt:c.token.k}); } else { const v=Math.min(Math.round(p.mhp*0.1*BM(p)),p.mhp-p.hp); p.hp+=v; ev.push({e:'tile',p:p.id,ty,k,v}); } }
   else if(ty==='storm'){ const tg=G.opps(s,p).filter(t=>G.dist(p.pos,t.pos)<=3); ev.push({e:'tile',p:p.id,ty,n:tg.length}); if(tg.length) strike(s,p,tg,G.atk(p)*2,'tile','번개 구름','공격력×2',ev); }
-  else if(ty==='swap'){ const o=G.opps(s,p); if(o.length){ const t=RNG.pick(o); const a1=p.pos, b1=t.pos; ev.push({e:'tile',p:p.id,ty,by:t.id}); if(a1!==b1){ p.pos=b1; t.pos=a1; ev.push({e:'move',p:p.id,from:a1,n:(b1-a1+BOARD_N)%BOARD_N,k:'warp'}); ev.push({e:'move',p:t.id,from:b1,n:(a1-b1+BOARD_N)%BOARD_N,k:'warp'}); } } else ev.push({e:'tile',p:p.id,ty}); }
+  else if(ty==='swap'){ const o=G.opps(s,p); if(o.length){ const t=RNG.pick(o); const a1=p.pos, b1=t.pos; ev.push({e:'tile',p:p.id,ty,by:t.id}); if(a1!==b1){ p.pos=b1; t.pos=a1; ev.push({e:'move',p:p.id,from:a1,n:(b1-a1+BOARD_N)%BOARD_N,k:'warp'}); ev.push({e:'move',p:t.id,from:b1,n:(a1-b1+BOARD_N)%BOARD_N,k:'warp'}); if(b1<a1) lapDone(s,p,ev,false); if(a1<b1) lapDone(s,t,ev,false); } } else ev.push({e:'tile',p:p.id,ty}); }
   else if(ty==='party'){ const all=[]; for(const q of G.alive(s)){ const v=Math.min(Math.round(q.mhp*(q.id===p.id?0.1:0.05)*BM(q)),q.mhp-q.hp); q.hp+=v; all.push([q.id,v]); } ev.push({e:'tile',p:p.id,ty,all}); }
   else if(ty==='card'){
     const k=RNG.pick(['heal','hit','ambush','guard','blast']);
@@ -3595,11 +3636,11 @@ function peerClientTransport(code){ const P=PeerC(); let mine={}, cb=null, hostP
   peer.on('disconnected',()=>retry(1500));
   return t; }
 
-function packState(s){ return {q:s.seq, r:s.round, st:s.st, ph:s.ph, ci:s.ci, sub:s.sub||0, o:s.order, w:s.win, fl:[s.fl.att,s.fl.sk,s.fl.cb||0], gq:(s.sub==='guard'&&s.gq&&s.gq[0])?[s.gq[0].a,s.gq[0].t,s.gq[0].d,s.gq[0].lb]:0, set:[s.set.hp,s.set.range,s.set.sd],
-  R:Object.keys(s.rolls).map(k=>{ const r=s.rolls[k]; return [+k,r.d,r.f,r.b,r.c,r.fs,r.st?1:0]; }),
+function packState(s){ return {q:s.seq, r:s.round, st:s.st, ph:s.ph, ci:s.ci, sub:s.sub||0, o:s.order, w:s.win, fl:[s.fl.att,s.fl.sk,s.fl.cb||0], gq:(s.sub==='guard'&&s.gq&&s.gq[0])?[s.gq[0].a,s.gq[0].t,s.gq[0].d,s.gq[0].lb]:0, rp:(s.sub==='rps'&&s.rps)?[s.rps.a,s.rps.b,s.rps.ca?1:0,s.rps.cb?1:0,s.rps.n]:0, ty:s.lastTy||0, set:[s.set.hp,s.set.range,s.set.sd],
+  R:Object.keys(s.rolls).map(k=>{ const r=s.rolls[k]; return [+k,r.d,r.f,r.b,r.c,r.fs,r.st?1:0,r.esc?1:0]; }),
   P:s.players.map(p=>[p.name,p.cid,p.own,p.pos,p.lap,p.lv,p.hp,p.mhp,p.sk,p.skl,p.tk,p.al,p.pv,p.bp,p.ab,p.db,p.dx,p.stun||0,p.emo||0,p.ba,p.bd]), pk:s.pd?s.pd.k+':'+(s.pd.mode||''):'' }; }
-function unpackState(g){ if(!g||!Array.isArray(g.P)||!Array.isArray(g.set)) return null; const rolls={}; (g.R||[]).forEach(r=>{ rolls[r[0]]={d:r[1]||[],f:r[2],b:r[3],c:r[4],fs:Array.isArray(r[5])?r[5]:null,st:r[6]?1:0}; });
-  return {v:2, seq:g.q, round:g.r, st:g.st, ph:g.ph, ci:g.ci, sub:g.sub||null, order:g.o||[], win:g.w, pd:g.pk?{k:String(g.pk).split(':')[0],mode:String(g.pk).split(':')[1]||''}:null, fl:{att:(g.fl||[])[0]||0, sk:(g.fl||[])[1]||0, cb:(g.fl||[])[2]||0}, gq:Array.isArray(g.gq)?[{a:g.gq[0],t:g.gq[1],d:+g.gq[2]||0,lb:String(g.gq[3]||'')}]:[],
+function unpackState(g){ if(!g||!Array.isArray(g.P)||!Array.isArray(g.set)) return null; const rolls={}; (g.R||[]).forEach(r=>{ rolls[r[0]]={d:r[1]||[],f:r[2],b:r[3],c:r[4],fs:Array.isArray(r[5])?r[5]:null,st:r[6]?1:0,esc:r[7]?1:0}; });
+  return {v:2, seq:g.q, round:g.r, st:g.st, ph:g.ph, ci:g.ci, sub:g.sub||null, order:g.o||[], win:g.w, pd:g.pk?{k:String(g.pk).split(':')[0],mode:String(g.pk).split(':')[1]||''}:null, fl:{att:(g.fl||[])[0]||0, sk:(g.fl||[])[1]||0, cb:(g.fl||[])[2]||0}, gq:Array.isArray(g.gq)?[{a:g.gq[0],t:g.gq[1],d:+g.gq[2]||0,lb:String(g.gq[3]||'')}]:[], rps:Array.isArray(g.rp)?{a:g.rp[0],b:g.rp[1],ha:g.rp[2],hb:g.rp[3],n:g.rp[4]}:null, lastTy:+g.ty||0,
     set:{hp:g.set[0],range:g.set[1],sd:g.set[2]}, rolls, out:[],
     players:g.P.map((a,i)=>({id:i,name:String(a[0]),cid:+a[1]||1,own:a[2],pos:a[3]|0,lap:a[4]|0,lv:a[5]|0,hp:a[6]|0,mhp:a[7]||1,sk:a[8]|0,skl:a[9]|0,tk:a[10]|0,al:a[11]|0,pv:a[12]|0,bp:a[13]|0,ab:a[14]|0,db:a[15]|0,dx:a[16]|0,stun:a[17]|0,emo:a[18]|0,ba:a[19]==null?undefined:+a[19],bd:a[20]==null?undefined:+a[20]})) }; }
 
@@ -3647,7 +3688,7 @@ function hostRemoteAct(dev,a){ const S=APP.S; if(!S||!a||typeof a!=='object') re
   if(a.t==='cheer'){ if(p.al) return; const now=Date.now(); HOST.cht=HOST.cht||{}; if(now-(HOST.cht[dev]||0)<600) return; HOST.cht[dev]=now; const T=S.players[+a.x]; if(T&&T.al&&APP.scr==='game') cheerFx(p.id,T.id); return; }
   let act=null; const t=a.t;
   if(t==='roll'){ if(a.r!==S.round) return; act={t:'roll',p:p.id,sk:a.sk?1:0}; }
-  else if(['attack','pick','skill','end','alloc','guard','combo','passive'].includes(t)){ if(a.q!==S.seq||ANIM.busy) return; act={t,p:p.id};
+  else if(['attack','pick','skill','end','alloc','guard','combo','passive','rps'].includes(t)){ if(t!=='rps'&&(a.q!==S.seq||ANIM.busy)) return; act={t,p:p.id}; if(t==='rps') act.c=String(a.c);
     if(t==='attack'||t==='pick') act.x=+a.x; if(t==='alloc'){ act.a=+a.a||0; act.d=+a.d||0; act.x=a.x?1:0; } if(t==='guard') act.u=a.u?1:0; }
   if(!act) return; const r=gameAct(S,act); if(r.ok) afterAct(r.ev); }
 function hostLobbySweep(){ if(APP.role!=='host'||APP.S||!HOST.t) return; const now=Date.now(); let ch=false;
@@ -3740,7 +3781,7 @@ function titleHTML(){ const sv=store.get('ank2-save',null); const can=!!(sv&&sv.
   <button class="btn candy wide" data-act="goJoin">🙋 폰으로 참가하기</button>
   ${can?`<button class="btn grape wide" data-act="resume">▶ 이어하기 (라운드 ${sv.S.round})</button>`:''}
   <div class="row2"><button class="btn ghost" data-act="rules">📖 게임 방법</button><button class="btn ghost" data-act="dex">🐾 캐릭터 도감</button></div></div>
-  <div class="foot">🏷️ 버전 12.00 · 1인용 난이도 5단계<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
+  <div class="foot">🏷️ 버전 13.00 · 가위바위보 & 태풍<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
 function updTitleBan(){ const b=$('#tban'); if(!b) return; const hs=NET.hosts||[];
   b.innerHTML=hs.length?`<div class="hostban">🎮 방 <b>${esc(hs[0])}</b>에서 플레이어를 모으고 있어요!<br><button class="btn sm sun" data-act="jRoom" data-c="${esc(hs[0])}" style="margin-top:6px">🙋 이 방에 참가하기</button></div>`:''; }
 
@@ -3785,7 +3826,7 @@ function rulesHTML(){ const s=APP.S?APP.S.set:APP.set; const pc=k=>Math.round(RU
   <h3>⚔️ 공격</h3><ul><li>일반 공격: ${s.range>=50?'거리 상관없이':'앞뒤 '+s.range+'칸 안의'} 상대 1명에게 <b>주사위 1개 × 공격력</b>.</li><li>받는 피해는 방어력만큼 줄어요 (방어력 50 → 75%, 100 → 60%, 200 → 43%).</li><li>💨 회피나 🛡️ 막기가 남아 있으면 상대 공격 한 번을 막아요.</li></ul>
   <h3>⭐ 레벨 업 (한 바퀴 = 30칸)</h3><ul><li>한 바퀴(30칸) 돌 때마다 레벨 +1 (최대 Lv${MAX_LV})</li><li>✨ 스킬은 레벨 업마다 <b>1개씩 쌓여요</b> (초기화 없음). 내 차례에 원할 때 골라서 써요 (한 차례에 1번)</li><li>보너스 <b>${RULES.bonus}점</b>을 공격력·방어력에 넣거나, ${RULES.diceCost}점을 써서 <b>주사위 1개의 눈 +1</b> (영구 · 예: 6눈 2개 → 7눈 1개 + 6눈 1개)</li><li>적마 · 양 · 돼지 · 상어 · 익룡은 +${RULES.bonusWeak}점 더</li><li>🎁 <b>균형 혜택</b>: 모든 캐릭터의 승률이 같아지도록 캐릭터마다 시작 체력과 레벨업 보너스를 조금씩 더 줘요 (도감에서 확인)</li><li>그 밖에: 최대 체력 +${pc('hpGrow')}%, 체력 ${pc('lapHeal')}% 회복, 스킬 · 회피 · 막기 충전</li></ul>
   <h3>🗺️ 이동 칸 (지도의 절반이 이벤트 칸)</h3><ul><li>⭐ <b>일반칸</b> — 아무 효과 없는 기본 칸</li><li>🎯 <b>랜덤 타인 공격</b> — 무작위 상대 1명을 공격 (주사위 1개 × 공격력)</li><li>🎯 <b>원하는 캐릭터 공격</b> — 고른 상대를 공격</li><li>⚔️ <b>랜덤 타인과 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>⚔️ <b>원하는 캐릭터와 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>🚫 <b>한 번 이동 불가</b> — 다음 라운드 한 번 움직이지 못해요</li><li>💚 <b>치료칸</b> — 체력 회복</li><li>💥 <b>공격당함</b> — 체력 5% 피해 (이 칸에서는 쓰러지지 않아요)</li><li>❓ <b>랜덤칸</b> — 5가지 중 하나: 🧙 도인 회복 100~1000 · 🥷 괴한 -100~1000 · 😈 랜덤 상대에게 방어력 무시 기습당하기 · 🛡️ 방어력 × 내 주사위 합만큼 회복 · 💣 나를 뺀 모두에게 방어력 무시 공격력×3 (이 칸 때문에 쓰러지는 일은 없어요)</li><li>⏩ <b>주사위 재굴림 전진</b> — 다시 굴려 그만큼 앞으로</li><li>⏪ <b>주사위 재굴림 후진</b> — 다시 굴려 그만큼 뒤로</li><li>🌈 무지개 워프: 주사위를 굴릴 때마다 <b>1% 확률</b>로 도착지(출발점)까지 한 번에 이동해서 바로 레벨 업!</li><li>지도 칸의 절반(50칸)이 이벤트 칸이에요</li></ul>
-  <h3>🎁 클디의 선물 칸</h3><ul><li>🍀 <b>행운의 클로버</b> — 보너스 점수 +10 (공격·방어·주사위에 써요)</li><li>🎁 <b>보물 상자</b> — 스킬 +1 · 회피/막기 +1 · 체력 회복 10% 중 하나</li><li>🌩️ <b>번개 구름</b> — 앞뒤 3칸 안의 상대 모두에게 공격력×2</li><li>🔄 <b>자리 바꾸기</b> — 무작위 상대와 자리를 바꿔요</li><li>🎪 <b>숲속 축제</b> — 모두 체력 +5%, 나는 +10%</li></ul><h3>🔥 대혼전</h3><p>${s.sd>0?`${s.sd}라운드부터 모든 공격 피해가 매 라운드 +${pc('sdStep')}%씩 커져요. 게임 설정에서 끌 수 있어요.`:'이번 게임은 대혼전이 꺼져 있어요.'}</p></div>`; }
+  <h3>🎁 클디의 선물 칸</h3><ul><li>🍀 <b>행운의 클로버</b> — 보너스 점수 +10 (공격·방어·주사위에 써요)</li><li>🎁 <b>보물 상자</b> — 스킬 +1 · 회피/막기 +1 · 체력 회복 10% 중 하나</li><li>🌩️ <b>번개 구름</b> — 앞뒤 3칸 안의 상대 모두에게 공격력×2</li><li>🔄 <b>자리 바꾸기</b> — 무작위 상대와 자리를 바꿔요</li><li>🎪 <b>숲속 축제</b> — 모두 체력 +5%, 나는 +10%</li></ul><h3>🆕 버전 13 새 규칙</h3><ul><li>✊✌️✋ <b>가위바위보</b> — 내 차례에 다른 기사와 같은 칸이면 가위바위보! 이기면 상대에게 방어력 무시 500 (비기면 다시, 최대 3판)</li><li>🔄 <b>자리 바꾸기</b> — 둘 다 앞으로만 이동해서 바꿔요. 출발점을 지나는 사람(앞에 있던 사람)은 레벨 업!</li><li>🌪️ <b>태풍</b> — 게임 중 딱 3번, 모든 기사가 무작위 칸으로 날아가요 (레벨 업 없음)</li><li>🚫 <b>이동 불가 칸</b> — 다음 라운드에도 주사위를 굴려요. 주사위 1개는 가장 높은 눈, 2~3개는 모두 같은 눈이 나오면 탈출해서 바로 이동!</li></ul><h3>🔥 대혼전</h3><p>${s.sd>0?`${s.sd}라운드부터 모든 공격 피해가 매 라운드 +${pc('sdStep')}%씩 커져요. 게임 설정에서 끌 수 있어요.`:'이번 게임은 대혼전이 꺼져 있어요.'}</p></div>`; }
 function menuHTML(){ const hostish=APP.role!=='client';
   return `<div class="sheet-h"><b>☰ 메뉴</b><button class="ib" data-act="closeSheet" aria-label="닫기">✕</button></div><div class="sheet-b"><div class="mrow">
   <button class="btn ghost wide" data-act="rules">📖 게임 방법</button><button class="btn ghost wide" data-act="dex">🐾 캐릭터 도감</button>
@@ -3824,6 +3865,7 @@ function renderDock(){ if(APP.role==='one') renderMe(); const el=$('#dock'); con
 function dockRoll(S){ const need=G.needRoll(S); const mine=need.filter(isLocalP), rem=need.filter(p=>!isLocalP(p)); const sharks=mine.filter(p=>G.canPre(S,p));
   let h=`<div class="dk-t">🎲 라운드 ${S.round} · 모두 함께 굴려요!</div><div class="rollers">${S.players.filter(p=>p.al).map(p=>{ const r=S.rolls[p.id]; return `<span class="rl ${r?'ok':''}" style="--pc:${pcol(p.id)}" title="${esc(p.name)}">${charSVG(p.cid,'head')}<em>${r?(r.st?'🚫':'✓'):(isLocalP(p)?'🖥️':'📱')}</em></span>`; }).join('')}</div>`;
   h+=sharks.map(p=>`<label class="tog"><input type="checkbox" data-act="sharkTog" data-p="${p.id}" ${APP.sharkSel[p.id]?'checked':''}> 🦈 ${esc(p.name)}: 광란의 질주 쓰기 (주사위 ${G.dice(p).n*2}개)</label>`).join('');
+  h+=mine.filter(p=>p.stun).map(p=>`<div class="al-rec">🚫 ${esc(p.name)}: ${G.dice(p).fs.length===1?'가장 높은 눈':'모두 같은 눈'}이 나오면 탈출!</div>`).join('');
   if(mine.length) h+=`<button class="btn big sun wide" data-act="rollAll">🎲 ${rem.length?'이 기기 플레이어 굴리기':'모두 굴리기!'}</button>`;
   if(rem.length) h+=`<div class="dk-wait">📱 ${rem.map(p=>esc(p.name)).join(', ')} 님이 폰에서 굴리는 중…</div><div class="row2"><button class="btn sm ghost" data-act="rollForce">⏩ 대신 굴려 주기</button></div>`;
   return h; }
@@ -3835,6 +3877,15 @@ function allocHTML(p,act){ const b=p.bp, cost=RULES.diceCost; const rc=recAlloc(
   ${b>=2?`<button class="btn sm ghost" data-act="${act}" data-k="half">⚔️+${Math.ceil(b/2)} 🛡️+${Math.floor(b/2)}</button>`:''}<button class="btn sm sun${R('dice')}" data-act="${act}" data-k="dice" ${b<cost?'disabled':''}>${B('dice')}🎲 주사위 눈 +1 (${cost}점)</button></div></div>`; }
 function allocAct(p,k){ const b=p.bp; if(k==='atk') return {t:'alloc',p:p.id,a:b,d:0,x:0}; if(k==='def') return {t:'alloc',p:p.id,a:0,d:b,x:0};
   if(k==='half') return {t:'alloc',p:p.id,a:Math.ceil(b/2),d:Math.floor(b/2),x:0}; return {t:'alloc',p:p.id,a:0,d:0,x:1}; }
+const RPSB=[['r','✊','바위'],['s','✌️','가위'],['p','✋','보']];
+function rpsChosen(R,id){ return id===R.a?!!(R.ca||R.ha):!!(R.cb||R.hb); }
+function rpsHTML(S,P,act,dis){ const R=S.rps; const O=S.players[P.id===R.a?R.b:R.a];
+  return `<div class="rpsbox"><div class="gd-t">✊✌️✋ 가위바위보!</div><div class="gd-i"><span class="av">${charSVG(O.cid,'head')}</span><div><b>${esc(P.name)}</b> vs <b>${esc(O.name)}</b><br><small>이기면 상대에게 방어력 무시 500!${R.n?` (비겨서 ${R.n+1}번째 판)`:''}</small></div></div><div class="rps-b">${RPSB.map(([c,ic,nm])=>`<button class="btn big rpsbtn" data-act="${act}" data-p="${P.id}" data-c="${c}" ${dis?'disabled':''}><span>${ic}</span>${nm}</button>`).join('')}</div></div>`; }
+function dockRps(S){ const R=S.rps; const ps=[S.players[R.a],S.players[R.b]];
+  const loc=ps.find(p=>p.own==='host'&&!rpsChosen(R,p.id)); if(loc) return rpsHTML(S,loc,'rps',false)+(ps.every(p=>p.own==='host')?'<div class="dk-hint">한 명씩 상대가 안 보게 골라 주세요 🙈</div>':'');
+  const rem=ps.find(p=>p.own!=='host'&&p.own!=='ai'&&!rpsChosen(R,p.id)); if(rem) return `<div class="dk-wait">📱 ${esc(rem.name)} 님이 폰에서 가위바위보를 고르는 중…</div><div class="row2"><button class="btn sm ghost" data-act="skipRemote">⏩ 대신 고르기</button></div>`;
+  return `<div class="dk-wait">✊✌️✋ ${esc(ps[0].name)} vs ${esc(ps[1].name)} 가위바위보 중…</div>`; }
+function stunHint(p){ const fs=G.dice(p).fs; return `<div class="al-rec">🚫 이동 불가 칸! ${fs.length===1?`<b>${fs[0]}</b>(가장 높은 눈)이 나오면`:'<b>모두 같은 눈</b>이 나오면'} 탈출해서 바로 이동해요</div>`; }
 function guardRec(T,g){ return g.d>=T.hp||g.d>=T.mhp*0.06; }
 function guardHTML(S,T,g,act,dis){ const A=S.players[g.a]; const tc=CHARS[T.cid]; const blk=tc.token&&tc.token.k==='block'; const nm=blk?'막기':'회피'; const ic=blk?'🛡️':'💨'; const left=Math.max(0,T.hp-g.d); const rec=guardRec(T,g);
   return `<div class="guard"><div class="gd-t">⚠️ ${esc(T.name)}에게 공격이 들어와요!</div><div class="gd-i"><span class="av">${A?charSVG(A.cid,'head'):''}</span><div>${A?esc(A.name):''}의 <b>${esc(g.lb||'공격')}</b><br>받을 피해 <b class="gd-d">-${fmt(g.d)}</b><br><small>체력 ${fmt(T.hp)} → ${fmt(left)}${left<=0?' 😵 탈락!':''}</small></div></div>
@@ -3848,7 +3899,7 @@ function specialBtns(S,p,pre){ const c=CHARS[p.cid]; let h='';
   if(G.canCombo(S,p)) h+=`<button class="btn big sun" data-act="${pre?'clCombo':'useCombo'}">💥 콤보 · ${esc(c.combo.nm)}<small>${esc(c.combo.ds)}</small></button>`;
   if(G.canPassive(S,p)) h+=`<button class="btn big candy" data-act="${pre?'clPassive':'usePassive'}">⚡ ${esc(c.passive.nm)} (${p.pv}회)<small>${esc(c.passive.ds)}</small></button>`;
   return h; }
-function dockRes(S){ if(S.sub==='guard'&&S.gq&&S.gq[0]) return dockGuard(S); const p=G.cur(S); if(!p) return '<div class="dk-cap">…</div>'; const c=CHARS[p.cid]; const ty=TT[p.pos];
+function dockRes(S){ if(S.sub==='rps'&&S.rps) return dockRps(S); if(S.sub==='guard'&&S.gq&&S.gq[0]) return dockGuard(S); const p=G.cur(S); if(!p) return '<div class="dk-cap">…</div>'; const c=CHARS[p.cid]; const ty=TT[p.pos];
   let h=`<div class="dk-who" style="--pc:${pcol(p.id)}"><div class="av">${charSVG(p.cid,'head')}</div><div><b>${esc(p.name)}</b> 차례<small>${S.ci+1}/${S.order.length}번째 · ${p.pos}번 칸${ty!=='plain'&&TILE_INFO[ty]?' ('+TILE_INFO[ty].nm+')':''}</small></div></div>`;
   if(p.own==='ai') return h+`<div class="dk-wait">🤖 ${esc(p.name)} 생각 중…</div>`;
   if(!isLocalP(p)) return h+`<div class="dk-wait">📱 ${esc(p.name)} 님이 폰에서 고르는 중…</div><div class="row2"><button class="btn sm ghost" data-act="skipRemote">⏩ 대신 넘기기</button></div>`;
@@ -3900,11 +3951,12 @@ function ctrlHTML(){ const g=CL.g, hp=CL.hp||{}; const me=clMe(); const c=CHARS[
   else if(!me.al){ const left=Math.max(0,20-Math.floor((Date.now()-(CL.deadAt||Date.now()))/1000));
     if(left>0) return pvWrap(g,me,`<div class="cm-big">😵</div><div class="cm-t">탈락했어요…</div><p class="cm-w"><b class="cnt">${left}</b>초 뒤에 응원할 수 있어요</p>`,' gray');
     m=`<div class="cm-t">📣 응원할 기사를 눌러 주세요!</div><p class="cm-w">누르면 메인 화면에서 그 기사가 반짝 빛나요</p><div class="cheer">${G.alive(g).map(p=>`<button class="ch-b" style="--pc:${pcol(p.id)}" data-act="clCheer" data-x="${p.id}" ${pend?'disabled':''}>${charSVG(p.cid,'full')}<b>${esc(p.name)}</b></button>`).join('')}</div>`; }
+  else if(g.sub==='rps'&&g.rps&&(g.rps.a===me.id||g.rps.b===me.id)) m=rpsChosen(g.rps,me.id)?`<div class="cm-t">✅ 골랐어요!</div><p class="cm-w">상대가 고를 때까지 기다려요… 결과는 메인 화면에서!</p>`:rpsHTML(g,me,'clRps',pend);
   else if(g.sub==='guard'&&g.gq&&g.gq[0]&&g.gq[0].t===me.id) m=guardHTML(g,me,g.gq[0],'clGuard',busy||pend);
   else if(g.ph==='roll'){ const r=g.rolls[me.id];
-    if(r&&r.st) m=`<div class="cm-big">🚫</div><p class="cm-w">이번 라운드는 움직일 수 없어요 (이동 불가 칸)</p>`;
-    else if(r){ const hv=r.c?comboVals(c.combo,r.d):[]; m=`<div class="cm-t">내 주사위</div><div class="dice">${r.d.map((v,i)=>dieHTML(v,fOf(r,i),'big'+(hv.includes(v)?' hl':''))).join('')}</div><div class="cm-sum">${sumArr(r.d)}칸 이동${r.c?' · 💥 '+esc(c.combo.nm):''}${r.b?' · 🦈 광란':''}</div><p class="cm-w">다른 플레이어를 기다리는 중… (${Object.keys(g.rolls).length}/${g.players.filter(p=>p.al).length})</p>`; }
-    else { const sh=G.canPre(g,me); m=`<div class="cm-t">라운드 ${g.round} · 주사위를 굴려요!</div>${sh?`<label class="tog big"><input type="checkbox" data-act="clSharkTog" ${CL.sk?'checked':''}> 🦈 광란의 질주 쓰기 (주사위 ${G.dice(me).n*2}개)</label>`:''}<button class="btn sun rollbtn" data-act="clRoll" ${pend?'disabled':''}>🎲<br>굴리기!</button>`; } }
+    if(r&&r.st) m=`<div class="cm-big">🚫</div><div class="dice">${r.d.map((v,i)=>dieHTML(v,fOf(r,i),'big')).join('')}</div><p class="cm-w">탈출 실패… 이번 라운드는 제자리예요</p>`;
+    else if(r){ const hv=r.c?comboVals(c.combo,r.d):[]; m=`<div class="cm-t">내 주사위</div><div class="dice">${r.d.map((v,i)=>dieHTML(v,fOf(r,i),'big'+(hv.includes(v)?' hl':''))).join('')}</div><div class="cm-sum">${sumArr(r.d)}칸 이동${r.c?' · 💥 '+esc(c.combo.nm):''}${r.b?' · 🦈 광란':''}${r.esc?' · 🎉 탈출!':''}</div><p class="cm-w">다른 플레이어를 기다리는 중… (${Object.keys(g.rolls).length}/${g.players.filter(p=>p.al).length})</p>`; }
+    else { const sh=G.canPre(g,me); m=`<div class="cm-t">라운드 ${g.round} · 주사위를 굴려요!</div>${me.stun?stunHint(me):''}${sh?`<label class="tog big"><input type="checkbox" data-act="clSharkTog" ${CL.sk?'checked':''}> 🦈 광란의 질주 쓰기 (주사위 ${G.dice(me).n*2}개)</label>`:''}<button class="btn sun rollbtn" data-act="clRoll" ${pend?'disabled':''}>🎲<br>굴리기!</button>`; } }
   else if(g.ph==='res'){ const cur=G.cur(g);
     if(cur&&cur.id===me.id){
       if(busy||pend) m=`<div class="cm-t">내 차례!</div><p class="cm-w">👀 메인 화면을 봐 주세요…</p>`;
@@ -3916,6 +3968,7 @@ function ctrlHTML(){ const g=CL.g, hp=CL.hp||{}; const me=clMe(); const c=CHARS[
   return pvWrap(g,me,m,''); }
 // 폰: 능력치 상승 · 기쁨/눈물 · 탈락 타이머 감지
 function clWatch(){ const g=CL.g, me=clMe(); if(!g||!me){ CL.pst=null; return; }
+  if(g.lastTy&&g.lastTy===g.round&&CL.tyShown!==g.round){ CL.tyShown=g.round; const el=document.createElement('div'); el.className='emopop sad'; el.innerHTML='<div class="ep-e">🌪️</div><div class="ep-t">태풍이 분다! 모두 자리가 바뀌었어요</div>'; el.onclick=()=>el.remove(); $('#app').appendChild(el); setTimeout(()=>el.remove(),2600); try{ navigator.vibrate&&navigator.vibrate([200,80,200,80,300]); }catch(e){} }
   if(!me.al&&!CL.deadAt){ CL.deadAt=Date.now(); clearInterval(CL.dT); CL.dT=setInterval(()=>{ _lastCl=''; renderClient(); if(Date.now()-CL.deadAt>21000) clearInterval(CL.dT); },1000); try{ navigator.vibrate&&navigator.vibrate(400); }catch(e){} }
   if(me.al) CL.deadAt=0;
   const fs=G.dice(me).fs; const st={id:me.id,lv:me.lv,atk:G.atk(me),def:G.def(me),dsum:fs.reduce((a,b)=>a+b,0),dl:diceLbl(me),emo:me.emo||0}; const pv=CL.pst; CL.pst=st;
@@ -3971,7 +4024,7 @@ const ACT={
   useSkill(){ const p=G.cur(APP.S); if(p) localAct({t:'skill',p:p.id}); },
   endStep(){ const p=G.cur(APP.S); if(p) localAct({t:'end',p:p.id}); },
   alloc(el){ const p=G.cur(APP.S); if(p) localAct(allocAct(p,el.dataset.k)); },
-  skipRemote(){ { const S0=APP.S; if(S0&&S0.sub==='guard'&&S0.gq&&S0.gq[0]){ const g0=S0.gq[0]; localAct({t:'guard',p:g0.t,u:guardRec(S0.players[g0.t],g0)?1:0}); return; } } const S=APP.S; const p=G.cur(S); if(!p) return; if(S.sub==='choose'){ const o=G.opps(S,p).sort((a,b)=>a.hp-b.hp); if(o[0]) localAct({t:'pick',p:p.id,x:o[0].id}); } else localAct({t:'end',p:p.id}); },
+  skipRemote(){ { const S1=APP.S; if(S1&&S1.sub==='rps'&&S1.rps){ const R=S1.rps; const id=[R.a,R.b].find(i=>!rpsChosen(R,i)&&S1.players[i].own!=='ai'); if(id!=null) localAct({t:'rps',p:id,c:'rsp'[Math.floor(Math.random()*3)]}); return; } } { const S0=APP.S; if(S0&&S0.sub==='guard'&&S0.gq&&S0.gq[0]){ const g0=S0.gq[0]; localAct({t:'guard',p:g0.t,u:guardRec(S0.players[g0.t],g0)?1:0}); return; } } const S=APP.S; const p=G.cur(S); if(!p) return; if(S.sub==='choose'){ const o=G.opps(S,p).sort((a,b)=>a.hp-b.hp); if(o[0]) localAct({t:'pick',p:p.id,x:o[0].id}); } else localAct({t:'end',p:p.id}); },
   camAll(){ CAM.all(); },
   zoomIn(){ CAM.zoomAt(1.7); }, zoomOut(){ CAM.zoomAt(1/1.7); },
   toggleLog(){ const lp=$('#logp'); if(!lp) return; lp.classList.toggle('hidden'); if(!lp.classList.contains('hidden')) renderLog(); },
@@ -4000,6 +4053,8 @@ const ACT={
   useCombo(){ const p=G.cur(APP.S); if(p) localAct({t:'combo',p:p.id}); }, usePassive(){ const p=G.cur(APP.S); if(p) localAct({t:'passive',p:p.id}); },
   clGuard(el){ const me=clMe(); if(me) clAct({t:'guard',p:me.id,u:+el.dataset.u,q:CL.g.seq}); },
   clCombo(){ const me=clMe(); if(me) clAct({t:'combo',p:me.id,q:CL.g.seq}); }, clPassive(){ const me=clMe(); if(me) clAct({t:'passive',p:me.id,q:CL.g.seq}); },
+  rps(el){ localAct({t:'rps',p:+el.dataset.p,c:el.dataset.c}); },
+  clRps(el){ const me=clMe(); if(me) clAct({t:'rps',p:me.id,c:el.dataset.c}); },
   clAlloc(el){ const me=clMe(); if(!me) return; const a=allocAct(me,el.dataset.k); a.q=CL.g.seq; clAct(a); },
 };
 // ===================== 1인용 모드 · 컴퓨터 상대 · 우승 장면 · 스크린샷 =====================
@@ -4037,11 +4092,12 @@ function renderMe(){ const box=$('#me'); if(!box||APP.role!=='one'||!APP.S) retu
   if(S.st==='end') m=`<div class="cm-big">🏆</div>`;
   else if(ANIM.busy) m=`<div class="cm-t">${ANIM.cap||'진행 중…'}</div><p class="cm-w">👀 장면을 보는 중…</p>`;
   else if(!me0.al) m=`<div class="cm-big">😵</div><div class="cm-t">탈락했어요…</div><p class="cm-w">남은 기사들의 싸움을 지켜보세요</p><button class="btn big mint" data-act="oneMap">🗺️ 전체화면으로 보기</button>`;
+  else if(S.sub==='rps'&&S.rps){ const R=S.rps; const mine=R.a===me0.id||R.b===me0.id; m=mine?(rpsChosen(R,me0.id)?'<div class="cm-t">✅ 골랐어요!</div><p class="cm-w">상대를 기다리는 중…</p>':rpsHTML(S,me0,'rps',false)):`<div class="cm-t">✊✌️✋ ${esc(S.players[R.a].name)} vs ${esc(S.players[R.b].name)}</div><p class="cm-w">가위바위보 중…</p>`; }
   else if(S.sub==='guard'&&S.gq&&S.gq[0]){ const g0=S.gq[0]; m=g0.t===me0.id?guardHTML(S,me0,g0,'guard',false):`<div class="cm-t">⚠️ ${esc(S.players[g0.t].name)} 공격 대응 중…</div>`; }
   else if(S.ph==='roll'){ const r=S.rolls[me.id];
-    if(r&&r.st) m=`<div class="cm-big">🚫</div><p class="cm-w">이번 라운드는 움직일 수 없어요 (이동 불가 칸)</p>`;
+    if(r&&r.st) m=`<div class="cm-big">🚫</div><div class="dice">${r.d.map((v,i)=>dieHTML(v,fOf(r,i),'big')).join('')}</div><p class="cm-w">탈출 실패… 이번 라운드는 제자리예요</p>`;
     else if(r) m=`<div class="cm-t">내 주사위</div><div class="dice">${r.d.map((v,i)=>dieHTML(v,fOf(r,i),'big')).join('')}</div>`;
-    else m=`<div class="cm-t">라운드 ${S.round} · 주사위를 굴려요!</div>${G.canPre(S,me0)?`<label class="tog big"><input type="checkbox" data-act="sharkTog" data-p="${me.id}" ${APP.sharkSel[me.id]?'checked':''}> 🦈 광란의 질주 쓰기</label>`:''}<button class="btn sun rollbtn" data-act="rollAll">🎲<br>굴리기!</button>`; }
+    else m=`<div class="cm-t">라운드 ${S.round} · 주사위를 굴려요!</div>${me0.stun?stunHint(me0):''}${G.canPre(S,me0)?`<label class="tog big"><input type="checkbox" data-act="sharkTog" data-p="${me.id}" ${APP.sharkSel[me.id]?'checked':''}> 🦈 광란의 질주 쓰기</label>`:''}<button class="btn sun rollbtn" data-act="rollAll">🎲<br>굴리기!</button>`; }
   else if(S.ph==='res'){ const cur=G.cur(S);
     if(cur&&cur.id===me.id){ const p=me0;
       if(S.sub==='choose') m=`<div class="cm-t">${chooseTitle(S)}</div><div class="tgts">${G.opps(S,p).map(t=>tgtBtn(S,p,t,'pick')).join('')}</div>`;
@@ -4063,6 +4119,7 @@ function aiStep(){ const S=APP.S; if(APP.role==='client'||!S||S.st!=='play'||APP
   if(S.ph==='roll'){ const need=G.needRoll(S).filter(p=>p.own==='ai'); if(!need.length) return;
     const ids=need.map(p=>p.id); aiDo({t:'rollall',ids,sk:ids.filter(id=>G.canPre(S,S.players[id])&&Math.random()<.5)}); return; }
   if(S.ph!=='res') return;
+  if(S.sub==='rps'&&S.rps){ const R=S.rps; for(const id of [R.a,R.b]){ const P=S.players[id]; if(P.own==='ai'&&!rpsChosen(R,id)){ aiDo({t:'rps',p:id,c:'rsp'[Math.floor(Math.random()*3)]}); return; } } return; }
   if(S.sub==='guard'&&S.gq&&S.gq[0]){ const g0=S.gq[0]; const T=S.players[g0.t]; if(T.own==='ai') aiDo({t:'guard',p:T.id,u:guardRec(T,g0)?1:0}); return; }
   const p=G.cur(S); if(!p||p.own!=='ai') return;
   if(S.sub==='choose'){ const o=G.opps(S,p).sort((a,b)=>a.hp-b.hp); if(o[0]) aiDo({t:'pick',p:p.id,x:o[0].id},p); else aiDo({t:'end',p:p.id}); return; }
@@ -4119,7 +4176,7 @@ Object.assign(ACT,{
 const MM={el:null,svg:null,g:null,pc:{},an:{},raf:0,mode:'',cx:null,cy:null,last:0,key:''};
 function oppHTML(g,me){ const ps=g.players.filter(p=>p.id!==me.id);
   return `<div class="opp">${ps.map(p=>`<div class="opp-i ${p.al?'':'dead'}" style="--pc:${pcol(p.id)}"><span class="av">${charSVG(p.cid,'head')}</span><small class="opp-lv">Lv ${p.lv}</small><b>${p.al?fmt(p.hp):'탈락'}</b></div>`).join('')}</div>`; }
-function pvInner(g,me,m){ const turn=/data-act="(clPick|clAttack|clAlloc|clAtkUi|clSkill|clCheer|clGuard|clCombo|clPassive|pick|attack|alloc|uiAtk|useSkill|guard|useCombo|usePassive)"/.test(m);
+function pvInner(g,me,m){ const turn=/data-act="(clPick|clAttack|clAlloc|clAtkUi|clSkill|clCheer|clGuard|clCombo|clPassive|clRps|pick|attack|alloc|uiAtk|useSkill|guard|useCombo|usePassive|rps)"/.test(m);
   return `${heroHTML(g,me)}<div class="pv${turn?' turn':''}"><div class="pv-map" data-mm></div><div class="pv-act">${m}</div></div>${oppHTML(g,me)}`; }
 function pvWrap(g,me,m,cls){ return `<div class="scr ctrl${cls||''}" style="--pc:${pcol(me.id)}">${pvInner(g,me,m)}</div>`; }
 function mmEnsure(){ if(MM.el) return MM.el; const d=document.createElement('div'); d.className='mm';
@@ -4170,7 +4227,7 @@ async function playBatch(ev){ const hasMA=ev.some(e=>e.e==='moveall');
 function applyEv(D,e){ const P=(e.p!=null&&e.p>=0)?D.players[e.p]:null;
   switch(e.e){
     case 'stun': D.rolls[e.p]={d:[],f:0,fs:[],b:0,c:0,st:1}; break;
-    case 'roll': D.rolls[e.p]={d:e.d,f:e.f,fs:e.fs,b:e.b,c:e.c}; break;
+    case 'roll': D.rolls[e.p]={d:e.d,f:e.f,fs:e.fs,b:e.b,c:e.c,st:e.st,esc:e.esc}; break;
     case 'moveall': e.m.forEach(m=>{ D.players[m.p].pos=(m.from+m.n)%BOARD_N; }); break;
     case 'lap': Object.assign(P,{lv:e.lv,sk:e.sk,skl:e.skl,tk:e.tk,mhp:e.mhp,lap:e.lap}); P.hp=Math.min(P.mhp,P.hp+(e.h||0)); if(e.bp!=null) P.bp=e.bp; break;
     case 'order': D.order=e.o.slice(); D.ph='res'; D.ci=-1; break;
@@ -4209,8 +4266,32 @@ async function playEv(e,hasMA){ const D=ANIM.D; const P=(e.p!=null&&e.p>=0)?D.pl
     case 'win': applyEv(D,e); renderChips(); log(`🏆 ${P?P.name:'무승부'} 승리!`); await winFx(e); break;
     case 'round': applyEv(D,e); renderTop(); renderChips(); markCur(); log(`— 라운드 ${e.r} —`); break;
     case 'revive': applyEv(D,e); renderChips(); renderPieces(D); updPcHP(e.p); sfx('lvl'); setTimeout(()=>sfx('heal'),350); floatTxt(e.p,'💖 부활!','heal'); log(`💖 ${P.name} 부활! 체력 ${fmt(e.h)}`); await banner('💖 부활!',`${nm} 다시 일어났어요!<br>체력 ${fmt(e.h)}으로 부활 (남은 부활 ${e.rev}번)`,P,1900); break;
+    case 'meet': await meetFx(e); break;
+    case 'rps': await rpsFx(e); break;
+    case 'typhoon': await typhoonFx(e); break;
     case 'sd': sfx('combo'); log('🔥 대혼전 시작!'); await banner('🔥 대혼전 시작!',`이제부터 모든 공격 피해가<br>매 라운드 +${Math.round(RULES.sdStep*100)}%씩 커져요`,null,1900); break;
   } }
+// ---------- 가위바위보 · 태풍 ----------
+const RPSH={r:'✊',s:'✌️',p:'✋'}, RPSN={r:'바위',s:'가위',p:'보'};
+async function meetFx(e){ const D=ANIM.D; const A=D.players[e.a], B=D.players[e.b]; log(`⚡ ${A.name}와(과) ${B.name} 한 칸에서 만남! 가위바위보 대결`); sfx('combo');
+  const el=fxAdd(`<div class="rpsov meet"><div class="rp-t">⚡ 한 칸에서 만났다!</div><div class="rp-st"><div class="rp-c a">${charSVG(A.cid,'full')}<b>${esc(A.name)}</b></div><div class="rp-vs">VS</div><div class="rp-c b">${charSVG(B.cid,'full')}<b>${esc(B.name)}</b></div></div><div class="rp-r">✊✌️✋ 가위바위보로 승부! 이기면 방어력 무시 500</div></div>`);
+  await wait(1600); fxDel(el); }
+async function rpsFx(e){ const D=ANIM.D; const A=D.players[e.a], B=D.players[e.b];
+  const el=fxAdd(`<div class="rpsov"><div class="rp-t">가위바위보!</div><div class="rp-st"><div class="rp-c a">${charSVG(A.cid,'full')}<b>${esc(A.name)}</b><div class="rp-h">✊</div></div><div class="rp-vs">VS</div><div class="rp-c b">${charSVG(B.cid,'full')}<b>${esc(B.name)}</b><div class="rp-h">✊</div></div></div><div class="rp-r">&nbsp;</div></div>`);
+  const t=el.querySelector('.rp-t'); for(const w of ['가위!','바위!','보!']){ t.textContent=w; el.classList.remove('shk'); void el.offsetWidth; el.classList.add('shk'); sfx('dice'); await wait(430); }
+  el.classList.remove('shk'); const hs=el.querySelectorAll('.rp-h'); hs[0].textContent=RPSH[e.ca]; hs[1].textContent=RPSH[e.cb]; hs.forEach(h=>h.classList.add('rev'));
+  const ca=el.querySelector('.rp-c.a'), cb=el.querySelector('.rp-c.b'), r=el.querySelector('.rp-r');
+  if(e.w===0){ r.innerHTML=`${RPSH[e.ca]} ${RPSN[e.ca]} = ${RPSN[e.cb]} ${RPSH[e.cb]}<br><b>비겼다! ${e.n<2?'한 번 더!':'무승부로 끝!'}</b>`; sfx('miss'); }
+  else { const W=e.w===1?A:B; (e.w===1?ca:cb).classList.add('win'); (e.w===1?cb:ca).classList.add('lose'); r.innerHTML=`${RPSH[e.ca]} ${RPSN[e.ca]} vs ${RPSN[e.cb]} ${RPSH[e.cb]}<br><b>${esc(W.name)} 승리! 방어력 무시 500!</b>`; sfx('combo'); }
+  log(`✊✌️✋ ${A.name} ${RPSN[e.ca]} vs ${B.name} ${RPSN[e.cb]} → ${e.w===0?'비김':(e.w===1?A.name:B.name)+' 승리'}`);
+  await wait(1600); fxDel(el); }
+async function flyPc(id,to){ const el=$('#pc'+id); if(!el||el._x==null) return; el._mv=1; const sx=el._x, sy=el._y, T=TILES[to];
+  await tween(1300,u=>{ const x=sx+(T.x-sx)*u, y=sy+(T.y-sy)*u-Math.sin(Math.PI*u)*300; el._x=x; el._y=y; el.setAttribute('transform',`translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${(u*1080).toFixed(0)})`); }); el._mv=0; }
+async function typhoonFx(e){ sfx('storm'); const D=ANIM.D;
+  const leaves=[...Array(26)].map((_,i)=>`<i class="tyl" style="top:${(Math.random()*100).toFixed(0)}%;animation-delay:${(Math.random()*1.2).toFixed(2)}s;animation-duration:${(0.9+Math.random()*0.9).toFixed(2)}s;font-size:${(18+Math.random()*26).toFixed(0)}px">${['🍃','🍂','💨','🌀','🍃'][i%5]}</i>`).join('');
+  const el=fxAdd(`<div class="typh"><div class="ty-sw"></div>${leaves}<div class="ty-t">🌪️ 태풍이 분다!</div><div class="ty-s">모든 기사가 날아가요! (레벨은 그대로예요)</div></div>`);
+  log('🌪️ 태풍이 불어 모두의 자리가 바뀌었어요!'); const g=$('#game'); if(g) g.classList.add('quake'); CAM.all(); await wait(1000);
+  await Promise.all(e.m.map(m=>flyPc(m[0],m[2]))); e.m.forEach(m=>{ D.players[m[0]].pos=m[2]; }); renderPieces(D); if(g) g.classList.remove('quake'); await wait(700); fxDel(el); }
 // ---------- 오버레이 ----------
 function fxAdd(h){ const fx=$('#fx'); if(!fx) return document.createElement('div'); fx.insertAdjacentHTML('beforeend',h); fx.classList.add('block'); return fx.lastElementChild; }
 function fxDel(el){ if(!el) return; el.classList.add('fade-out'); setTimeout(()=>{ el.remove(); const fx=$('#fx'); if(fx&&!fx.querySelector('.tray,.bnr,.battle,.cardfx,.winov')) fx.classList.remove('block'); },200); }
@@ -4228,7 +4309,7 @@ async function showTray(D){ const rows=D.players.filter(p=>p.al&&D.rolls[p.id]);
   const el=fxAdd(`<div class="tray"><h4>🎲 라운드 ${D.round} 주사위!</h4>${rows.map(p=>{ const r=D.rolls[p.id]; return `<div class="tr-row" style="--pc:${pcol(p.id)}"><div class="av">${charSVG(p.cid,'head')}</div><div class="tr-nm">${esc(p.name)}</div><div class="tr-d" data-p="${p.id}">${r.d.map((_,i)=>dieHTML(1+Math.floor(Math.random()*fOf(r,i)),fOf(r,i),'tum')).join('')}</div><div class="tr-s">?</div></div>`; }).join('')}</div>`);
   await wait(650);
   rows.forEach(p=>{ const r=D.rolls[p.id], c=CHARS[p.cid]; const hv=r.c?comboVals(c.combo,r.d):[]; const row=el.querySelector(`.tr-d[data-p="${p.id}"]`); if(!row) return;
-    row.innerHTML=r.d.map((v,i)=>dieHTML(v,fOf(r,i),hv.includes(v)?'hl':'')).join('')+(r.b?'<span class="tr-c">🦈 광란</span>':'')+(r.c?`<span class="tr-c">💥 ${esc(c.combo.nm)}</span>`:'')+(r.st?'<span class="tr-c">🚫 이동 불가</span>':''); if(row.nextElementSibling) row.nextElementSibling.textContent=sumArr(r.d); });
+    row.innerHTML=r.d.map((v,i)=>dieHTML(v,fOf(r,i),hv.includes(v)?'hl':'')).join('')+(r.b?'<span class="tr-c">🦈 광란</span>':'')+(r.st?'<span class="tr-c">🚫 탈출 실패</span>':'')+(r.esc?'<span class="tr-c">🎉 탈출!</span>':'')+(r.c?`<span class="tr-c">💥 ${esc(c.combo.nm)}</span>`:'')+(r.st?'<span class="tr-c">🚫 이동 불가</span>':''); if(row.nextElementSibling) row.nextElementSibling.textContent=r.st?0:sumArr(r.d); });
   sfx('pop'); await wait(rows.some(p=>D.rolls[p.id].c)?1500:1100); fxDel(el); }
 async function xrollPop(e){ const lb={fwd:'🎲 재굴림 전진!',back:'🎲 재굴림 후진!',move:'🎲 추가 이동',pick:'🎲 추가 공격',skill:'🎲 스킬 주사위',atk:'🎲 공격 주사위'}[e.why]||'🎲'; const fx=$('#fx'); if(!fx) return;
   fx.insertAdjacentHTML('beforeend',`<div class="xr"><span>${lb}</span><span class="dice">${e.d.map((_,i)=>dieHTML(1+Math.floor(Math.random()*fOf(e,i)),fOf(e,i),'tum')).join('')}</span></div>`); const el=fx.lastElementChild; sfx('dice');
@@ -4435,8 +4516,9 @@ function orchLevel(c,d,t){ brass(c,d,67,t,0.11,0.9); brass(c,d,67,t+0.14,0.11,0.
 function orchWin(c,d,t){ const seq=[[60,.18],[64,.18],[67,.18],[72,.5]]; let tt=t; seq.forEach(([n,l])=>{ brass(c,d,n,tt,l*0.9,1); tt+=l; });
   [60,64,67,72,76].forEach(n=>brass(c,d,n,tt,1.7,0.95)); strings(c,d,[48,60,64,67,72,79],tt,2.0,1.1); timp(c,d,36,tt,1.1); timp(c,d,43,tt+0.5,0.8); timp(c,d,36,tt+1.0,1); cymbal(c,d,tt,1); [84,88,91,96].forEach((n,i)=>harp(c,d,n,tt+0.2+i*0.07,0.7)); }
 function orchCombo(c,d,t){ [62,66,69,74].forEach((n,i)=>brass(c,d,n,t+i*0.07,0.14,0.85)); brass(c,d,78,t+0.3,0.5,0.9); cymbal(c,d,t+0.3,0.7); timp(c,d,38,t+0.3,0.8); }
+function orchStorm(c,d,t){ for(let i=0;i<10;i++) timp(c,d,i%2?43:36,t+i*0.07,0.5); noiseHit(c,d,t,0.35,2.6,'bandpass',700); noiseHit(c,d,t+0.3,0.25,2.2,'lowpass',400); brass(c,d,38,t+0.7,1.0,1); brass(c,d,45,t+0.7,1.0,0.9); brass(c,d,50,t+0.7,1.0,0.8); cymbal(c,d,t+0.7,1); }
 const _sfxBase=sfx;
-sfx=function(k){ if(APP.mute||APP.tspd) return; const big={hit:orchHit,heal:orchHeal,lvl:orchLevel,win:orchWin,combo:orchCombo}[k];
+sfx=function(k){ if(APP.mute||APP.tspd) return; const big={hit:orchHit,heal:orchHeal,lvl:orchLevel,win:orchWin,combo:orchCombo,storm:orchStorm}[k];
   if(!big) return _sfxBase(k); const c=oc(); if(!c) return; try{ big(c,ORCH.sfx,c.currentTime+0.01); }catch(e){ console.warn(e); } };
 // ---------- 배경음악: 「기사단의 서약」 (D단조 · 96BPM · 8마디 반복) ----------
 const BGM={on:false,t:0,bar:0,timer:0};
