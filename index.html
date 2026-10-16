@@ -3278,7 +3278,7 @@ const RNG = {
   pick:(a)=>a[Math.floor(Math.random()*a.length)],
 };
 const sumArr = a => a.reduce((x,y)=>x+y,0);
-const MAX_LV = 20;
+const MAX_LV = Infinity; // 레벨 무제한
 // 밸런스 수치: 비율은 시작 체력 기준
 const RULES = {hpGrow:0.05, lapHeal:0.05, heal:0.05, trap:0.03, trHeal:0.1, trHeal2:0.05, bolt:3, defK:150, sdStep:0.25, cardMin:100, cardMax:1000, atkDie:1, warp:0.01, bonus:20, bonusWeak:5, diceCost:20, hurt:0.05};
 const AMT = (s,k)=>Math.round(s.set.hp*RULES[k]);
@@ -3781,7 +3781,7 @@ function titleHTML(){ const sv=store.get('ank2-save',null); const can=!!(sv&&sv.
   <button class="btn candy wide" data-act="goJoin">🙋 폰으로 참가하기</button>
   ${can?`<button class="btn grape wide" data-act="resume">▶ 이어하기 (라운드 ${sv.S.round})</button>`:''}
   <div class="row2"><button class="btn ghost" data-act="rules">📖 게임 방법</button><button class="btn ghost" data-act="dex">🐾 캐릭터 도감</button></div></div>
-  <div class="foot">🏷️ 버전 14.00 · 진짜 오케스트라 음악<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
+  <div class="foot">🏷️ 버전 15.00 · 레벨 무제한<br>${mode==='room'?'폰 연결: claude.ai에 같은 조직 계정으로 로그인한 폰이면 돼요':mode==='peer'?'폰 연결: 메인 화면의 QR만 찍으면 돼요':''}</div></div></div></div>`; }
 function updTitleBan(){ const b=$('#tban'); if(!b) return; const hs=NET.hosts||[];
   b.innerHTML=hs.length?`<div class="hostban">🎮 방 <b>${esc(hs[0])}</b>에서 플레이어를 모으고 있어요!<br><button class="btn sm sun" data-act="jRoom" data-c="${esc(hs[0])}" style="margin-top:6px">🙋 이 방에 참가하기</button></div>`:''; }
 
@@ -3824,7 +3824,7 @@ function rulesHTML(){ const s=APP.S?APP.S.set:APP.set; const pc=k=>Math.round(RU
   <h3>🎯 목표</h3><p>동물 기사들이 세계 지도를 돌며 싸워요. 마지막까지 살아남은 기사가 승리!</p>
   <h3>🎲 한 라운드</h3><ul><li>모두 <b>동시에</b> 주사위를 굴리고, 모든 말이 한꺼번에 이동해요.</li><li>그다음 <b>맨 앞에 있는 사람부터</b> 차례로 특수상황을 진행해요: 콤보 → 도착한 칸 → 보너스 · 공격 · 스킬.</li><li>메인 화면 하나로 할 때는 메인에서 모두 진행하고, 폰을 연결하면 각자 폰에서 굴리고 골라요.</li></ul>
   <h3>⚔️ 공격</h3><ul><li>일반 공격: ${s.range>=50?'거리 상관없이':'앞뒤 '+s.range+'칸 안의'} 상대 1명에게 <b>주사위 1개 × 공격력</b>.</li><li>받는 피해는 방어력만큼 줄어요 (방어력 50 → 75%, 100 → 60%, 200 → 43%).</li><li>💨 회피나 🛡️ 막기가 남아 있으면 상대 공격 한 번을 막아요.</li></ul>
-  <h3>⭐ 레벨 업 (한 바퀴 = 30칸)</h3><ul><li>한 바퀴(30칸) 돌 때마다 레벨 +1 (최대 Lv${MAX_LV})</li><li>✨ 스킬은 레벨 업마다 <b>1개씩 쌓여요</b> (초기화 없음). 내 차례에 원할 때 골라서 써요 (한 차례에 1번)</li><li>보너스 <b>${RULES.bonus}점</b>을 공격력·방어력에 넣거나, ${RULES.diceCost}점을 써서 <b>주사위 1개의 눈 +1</b> (영구 · 예: 6눈 2개 → 7눈 1개 + 6눈 1개)</li><li>적마 · 양 · 돼지 · 상어 · 익룡은 +${RULES.bonusWeak}점 더</li><li>🎁 <b>균형 혜택</b>: 모든 캐릭터의 승률이 같아지도록 캐릭터마다 시작 체력과 레벨업 보너스를 조금씩 더 줘요 (도감에서 확인)</li><li>그 밖에: 최대 체력 +${pc('hpGrow')}%, 체력 ${pc('lapHeal')}% 회복, 스킬 · 회피 · 막기 충전</li></ul>
+  <h3>⭐ 레벨 업 (한 바퀴 = 30칸)</h3><ul><li>한 바퀴(30칸) 돌 때마다 레벨 +1 (<b>레벨 제한 없음 · 무제한!</b>)</li><li>✨ 스킬은 레벨 업마다 <b>1개씩 쌓여요</b> (초기화 없음). 내 차례에 원할 때 골라서 써요 (한 차례에 1번)</li><li>보너스 <b>${RULES.bonus}점</b>을 공격력·방어력에 넣거나, ${RULES.diceCost}점을 써서 <b>주사위 1개의 눈 +1</b> (영구 · 예: 6눈 2개 → 7눈 1개 + 6눈 1개)</li><li>적마 · 양 · 돼지 · 상어 · 익룡은 +${RULES.bonusWeak}점 더</li><li>🎁 <b>균형 혜택</b>: 모든 캐릭터의 승률이 같아지도록 캐릭터마다 시작 체력과 레벨업 보너스를 조금씩 더 줘요 (도감에서 확인)</li><li>그 밖에: 최대 체력 +${pc('hpGrow')}%, 체력 ${pc('lapHeal')}% 회복, 스킬 · 회피 · 막기 충전</li></ul>
   <h3>🗺️ 이동 칸 (지도의 절반이 이벤트 칸)</h3><ul><li>⭐ <b>일반칸</b> — 아무 효과 없는 기본 칸</li><li>🎯 <b>랜덤 타인 공격</b> — 무작위 상대 1명을 공격 (주사위 1개 × 공격력)</li><li>🎯 <b>원하는 캐릭터 공격</b> — 고른 상대를 공격</li><li>⚔️ <b>랜덤 타인과 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>⚔️ <b>원하는 캐릭터와 대결</b> — 둘이 주사위를 굴려 서로 한 대씩! (주사위 × 공격력, 높은 쪽이 먼저)</li><li>🚫 <b>한 번 이동 불가</b> — 다음 라운드 한 번 움직이지 못해요</li><li>💚 <b>치료칸</b> — 체력 회복</li><li>💥 <b>공격당함</b> — 체력 5% 피해 (이 칸에서는 쓰러지지 않아요)</li><li>❓ <b>랜덤칸</b> — 5가지 중 하나: 🧙 도인 회복 100~1000 · 🥷 괴한 -100~1000 · 😈 랜덤 상대에게 방어력 무시 기습당하기 · 🛡️ 방어력 × 내 주사위 합만큼 회복 · 💣 나를 뺀 모두에게 방어력 무시 공격력×3 (이 칸 때문에 쓰러지는 일은 없어요)</li><li>⏩ <b>주사위 재굴림 전진</b> — 다시 굴려 그만큼 앞으로</li><li>⏪ <b>주사위 재굴림 후진</b> — 다시 굴려 그만큼 뒤로</li><li>🌈 무지개 워프: 주사위를 굴릴 때마다 <b>1% 확률</b>로 도착지(출발점)까지 한 번에 이동해서 바로 레벨 업!</li><li>지도 칸의 절반(50칸)이 이벤트 칸이에요</li></ul>
   <h3>🎁 클디의 선물 칸</h3><ul><li>🍀 <b>행운의 클로버</b> — 보너스 점수 +10 (공격·방어·주사위에 써요)</li><li>🎁 <b>보물 상자</b> — 스킬 +1 · 회피/막기 +1 · 체력 회복 10% 중 하나</li><li>🌩️ <b>번개 구름</b> — 앞뒤 3칸 안의 상대 모두에게 공격력×2</li><li>🔄 <b>자리 바꾸기</b> — 무작위 상대와 자리를 바꿔요</li><li>🎪 <b>숲속 축제</b> — 모두 체력 +5%, 나는 +10%</li></ul><h3>🆕 버전 13 새 규칙</h3><ul><li>✊✌️✋ <b>가위바위보</b> — 내 차례에 다른 기사와 같은 칸이면 가위바위보! 이기면 상대에게 방어력 무시 500 (비기면 다시, 최대 3판)</li><li>🔄 <b>자리 바꾸기</b> — 둘 다 앞으로만 이동해서 바꿔요. 출발점을 지나는 사람(앞에 있던 사람)은 레벨 업!</li><li>🌪️ <b>태풍</b> — 게임 중 딱 3번, 모든 기사가 무작위 칸으로 날아가요 (레벨 업 없음)</li><li>🚫 <b>이동 불가 칸</b> — 다음 라운드에도 주사위를 굴려요. 주사위 1개는 가장 높은 눈, 2~3개는 모두 같은 눈이 나오면 탈출해서 바로 이동!</li></ul><h3>🎵 음악</h3><p>Epic Cinema Adventure (Skilsel) · Epic Cinematic Bold Drums, RPG Fantasy Tavern Quest (Alex Morgan) · A Slightly Heroic Orchestral March, Dark Orchestral Battle Tension (Montogoronto) — Pixabay 무료 음원, 무작위 순서로 재생돼요</p><h3>🔥 대혼전</h3><p>${s.sd>0?`${s.sd}라운드부터 모든 공격 피해가 매 라운드 +${pc('sdStep')}%씩 커져요. 게임 설정에서 끌 수 있어요.`:'이번 게임은 대혼전이 꺼져 있어요.'}</p></div>`; }
 function menuHTML(){ const hostish=APP.role!=='client';
